@@ -16,3 +16,8 @@ var (
 	ErrCacheNotSupported = errors.New("Operation not supported")
 )
 
+//Interface for all onecache store implementations
+type CacheStore interface {
+	Set(key string, data interface{}, expires time.Duration) error
+	Get(key string) ([]byte, error)
+}
