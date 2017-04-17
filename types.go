@@ -16,8 +16,14 @@ var (
 	ErrCacheNotSupported = errors.New("Operation not supported")
 )
 
+//identifes a cached piece of data
+type Item struct {
+	ExpiresAt time.Time
+	Data      interface{}
+}
+
 //Interface for all onecache store implementations
 type CacheStore interface {
 	Set(key string, data interface{}, expires time.Duration) error
-	Get(key string) ([]byte, error)
+	Get(key string) (interface{}, error)
 }

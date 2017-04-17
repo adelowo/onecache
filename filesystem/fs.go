@@ -3,13 +3,8 @@ package filesystem
 
 import (
 	"bytes"
-	"crypto/md5"
 	"encoding/gob"
-	"encoding/json"
-	"errors"
 	"fmt"
-	"hash"
-	"io/ioutil"
 	"os"
 	"time"
 
@@ -21,70 +16,45 @@ const (
 	defaultDirectoryFilePerm             = 0755
 )
 
-var (
-	//Onecache's error that defines an error with json marshalling
-	ErrCacheCouldNotBeSerialized = errors.New("Data could not be serialized")
-)
 
 func createDirectory(dir string) error {
 
 	return os.MkdirAll(dir, defaultDirectoryFilePerm)
 }
 
-//identides a cached piece of data
-type item struct {
-	ExpiresAt time.Time   `json:"expires_at"`
-	Data      interface{} `json:"data"`
-}
 
-type FSCache struct {
+type FSStore struct {
 	baseDir string
-	hasher  hash.Hash
 }
 
 //Returns an initialized Filesystem Cache
 //If a non-existent directory is passed, it would be created automatically.
 //This function Panics if the directory could not be created
-func MustNewFSCache(baseDir string) *FSCache {
+func MustNewFSStore(baseDir string) *FSStore {
 
 	_, err := os.Stat(baseDir)
 
 	if err != nil { //Directory does not exist..Let's create it
-		err = createDirectory(baseDir)
-
-		if err != nil {
+		if err := createDirectory(baseDir); err != nil {
 			panic(fmt.Errorf("Base directory could not be created : %s", err))
 		}
 	}
 
-	return &FSCache{baseDir, md5.New()}
+	return &FSStore{baseDir}
 }
 
-func (fs *FSCache) Set(key string, data interface{}, expiresAt time.Duration) error {
-
-	i := item{time.Now().Add(expiresAt), data}
-
-	b, err := json.Marshal(i)
-
-	if err != nil {
-		return ErrCacheCouldNotBeSerialized
-	}
-
-	if err = ioutil.WriteFile(fs.getFileNameFor(key), b, defaultFilePerm); err == nil {
-		return nil
-	}
+func (fs *FSStore) Set(key string, data interface{}, expiresAt time.Duration) error {
 
 	return onecache.ErrCacheNotStored
 }
 
-func (fs *FSCache) Get(key string) ([]byte, error) {
-	panic("Not implemented")
+func (fs *FSStore) Get(key string) ([]byte, error) {
+
+	return nil, nil
 }
 
-func (fs *FSCache) getFileNameFor(key string) string {
-	hashedFilePath := fmt.Sprintf("%x", string(fs.hasher.Sum([]byte(key))))
-
-	return fs.baseDir + string(os.PathSeparator) + hashedFilePath
+func (fs *FSStore) getFileNameFor(key string) string {
+	return ""
 }
 
 func toBytes(val interface{}) ([]byte, error) {
