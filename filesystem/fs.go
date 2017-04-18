@@ -86,9 +86,9 @@ func (fs *FSStore) Get(key string) (interface{}, error) {
 	return i.Data, nil
 }
 
+//Removes a file (cached item) from the disk
 func (fs *FSStore) Delete(key string) error {
-
-	return nil
+	return os.RemoveAll(fs.getFilePathFor(key))
 }
 
 //Gets a unique path for a cache key.
