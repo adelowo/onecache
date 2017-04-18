@@ -91,6 +91,11 @@ func (fs *FSStore) Delete(key string) error {
 	return os.RemoveAll(fs.getFilePathFor(key))
 }
 
+//Cleans up the entire cache
+func (fs *FSStore) Flush() error {
+	return os.RemoveAll(fs.baseDir)
+}
+
 //Gets a unique path for a cache key.
 //This is going to be a directory 3 level deep. Something like "basedir/33/rr/33/hash"
 func (fs *FSStore) getFilePathFor(key string) string {
