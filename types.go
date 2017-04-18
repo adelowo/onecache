@@ -27,4 +27,5 @@ type CacheStore interface {
 	Set(key string, data interface{}, expires time.Duration) error
 	Get(key string) (interface{}, error)
 	Delete(key string) error
+	Flush() error
 }
