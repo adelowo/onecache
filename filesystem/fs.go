@@ -66,9 +66,29 @@ func (fs *FSStore) Set(key string, data interface{}, expiresAt time.Duration) er
 	return nil
 }
 
+//Fetches a cache key.
+//This runs garbage collection on the key if necessary
 func (fs *FSStore) Get(key string) (interface{}, error) {
 
-	return nil, nil
+	b, err := ioutil.ReadFile(fs.getFilePathFor(key))
+
+	if err != nil {
+		return nil, err
+	}
+
+	i, err := onecache.BytesToItem(b)
+
+	if i.IsExpired() {
+		fs.Delete(key)
+		return nil, onecache.ErrCacheMiss
+	}
+
+	return i.Data, nil
+}
+
+func (fs *FSStore) Delete(key string) error {
+
+	return nil
 }
 
 //Gets a unique path for a cache key.
