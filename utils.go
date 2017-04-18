@@ -7,7 +7,7 @@ import (
 )
 
 //Converts an item into bytes
-func (i *Item) ToBytes() ([]byte, error) {
+func (i *Item) Bytes() ([]byte, error) {
 
 	var buf bytes.Buffer
 

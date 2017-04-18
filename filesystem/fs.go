@@ -53,7 +53,7 @@ func (fs *FSStore) Set(key string, data interface{}, expiresAt time.Duration) er
 
 	i := &onecache.Item{ExpiresAt: time.Now().Add(expiresAt), Data: data}
 
-	b, err := i.ToBytes()
+	b, err := i.Bytes()
 
 	if err != nil {
 		return err
