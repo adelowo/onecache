@@ -2,10 +2,12 @@
 package filesystem
 
 import (
-	"bytes"
-	"encoding/gob"
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
+	"io/ioutil"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/adelowo/onecache"
@@ -16,12 +18,10 @@ const (
 	defaultDirectoryFilePerm             = 0755
 )
 
-
 func createDirectory(dir string) error {
 
 	return os.MkdirAll(dir, defaultDirectoryFilePerm)
 }
-
 
 type FSStore struct {
 	baseDir string
@@ -45,28 +45,41 @@ func MustNewFSStore(baseDir string) *FSStore {
 
 func (fs *FSStore) Set(key string, data interface{}, expiresAt time.Duration) error {
 
-	return onecache.ErrCacheNotStored
+	path := fs.getFilePathFor(key)
+
+	if err := os.MkdirAll(filepath.Dir(path), defaultDirectoryFilePerm); err != nil {
+		return err
+	}
+
+	i := &onecache.Item{ExpiresAt: time.Now().Add(expiresAt), Data: data}
+
+	b, err := i.ToBytes()
+
+	if err != nil {
+		return err
+	}
+
+	if err = ioutil.WriteFile(path, b, defaultFilePerm); err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func (fs *FSStore) Get(key string) ([]byte, error) {
+func (fs *FSStore) Get(key string) (interface{}, error) {
 
 	return nil, nil
 }
 
-func (fs *FSStore) getFileNameFor(key string) string {
-	return ""
-}
+//Gets a unique path for a cache key.
+//This is going to be a directory 3 level deep. Something like "basedir/33/rr/33/hash"
+func (fs *FSStore) getFilePathFor(key string) string {
+	hashSum := md5.Sum([]byte(key))
 
-func toBytes(val interface{}) ([]byte, error) {
-	var buf bytes.Buffer
+	hashSumAsString := hex.EncodeToString(hashSum[:])
 
-	enc := gob.NewEncoder(&buf)
-
-	err := enc.Encode(val)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
+	return filepath.Join(fs.baseDir,
+		string(hashSumAsString[0:2]),
+		string(hashSumAsString[2:4]),
+		string(hashSumAsString[4:6]), hashSumAsString)
 }
