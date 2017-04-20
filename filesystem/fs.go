@@ -45,7 +45,7 @@ func MustNewFSStore(baseDir string) *FSStore {
 
 func (fs *FSStore) Set(key string, data interface{}, expiresAt time.Duration) error {
 
-	path := fs.getFilePathFor(key)
+	path := fs.filePathFor(key)
 
 	if err := os.MkdirAll(filepath.Dir(path), defaultDirectoryFilePerm); err != nil {
 		return err
@@ -70,7 +70,7 @@ func (fs *FSStore) Set(key string, data interface{}, expiresAt time.Duration) er
 //This runs garbage collection on the key if necessary
 func (fs *FSStore) Get(key string) (interface{}, error) {
 
-	b, err := ioutil.ReadFile(fs.getFilePathFor(key))
+	b, err := ioutil.ReadFile(fs.filePathFor(key))
 
 	if err != nil {
 		return nil, err
@@ -88,7 +88,7 @@ func (fs *FSStore) Get(key string) (interface{}, error) {
 
 //Removes a file (cached item) from the disk
 func (fs *FSStore) Delete(key string) error {
-	return os.RemoveAll(fs.getFilePathFor(key))
+	return os.RemoveAll(fs.filePathFor(key))
 }
 
 //Cleans up the entire cache
@@ -98,7 +98,7 @@ func (fs *FSStore) Flush() error {
 
 //Gets a unique path for a cache key.
 //This is going to be a directory 3 level deep. Something like "basedir/33/rr/33/hash"
-func (fs *FSStore) getFilePathFor(key string) string {
+func (fs *FSStore) filePathFor(key string) string {
 	hashSum := md5.Sum([]byte(key))
 
 	hashSumAsString := hex.EncodeToString(hashSum[:])
