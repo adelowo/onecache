@@ -1,9 +1,9 @@
 package onecache
 
 import (
-	"reflect"
 	"testing"
 	"time"
+	"reflect"
 )
 
 func TestItem_IsExpired(t *testing.T) {
@@ -17,7 +17,7 @@ func TestItem_IsExpired(t *testing.T) {
 
 func TestBytesToItem(t *testing.T) {
 
-	item := &Item{ExpiresAt: time.Now().Add(-2 * time.Minute), Data: "Ping-Pong"}
+	item := &Item{ExpiresAt: time.Now(), Data: "Ping-Pong"}
 
 	b, err := item.Bytes()
 
@@ -31,8 +31,12 @@ func TestBytesToItem(t *testing.T) {
 		t.Error(err)
 	}
 
-	if !reflect.DeepEqual(item, i) {
-		t.Fatalf("Items differ..  \n Expected %v. \n Got %v", item, i)
+	if !item.ExpiresAt.Equal(i.ExpiresAt) {
+		t.Fatalf("Time should equal.. Expected %v \n Got %v", item.ExpiresAt, i.ExpiresAt)
+	}
+
+	if !reflect.DeepEqual(item.Data, i.Data) {
+		t.Fatalf("Data not equal.. Expected %v \n. Got %v", item.ExpiresAt, i.ExpiresAt)
 	}
 
 }
