@@ -49,6 +49,10 @@ func (r *RedisStore) Delete(key string) error {
 	return r.client.Del(r.key(key)).Err()
 }
 
+func (r *RedisStore) Flush() error {
+	return r.client.FlushDb().Err()
+}
+
 func (r *RedisStore) key(k string) string {
 	return r.prefix + k
 }
