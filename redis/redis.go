@@ -45,6 +45,10 @@ func (r *RedisStore) Get(key string) (interface{}, error) {
 	return val, nil
 }
 
+func (r *RedisStore) Delete(key string) error {
+	return r.client.Del(r.key(key)).Err()
+}
+
 func (r *RedisStore) key(k string) string {
 	return r.prefix + k
 }
