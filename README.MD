@@ -4,10 +4,10 @@
 
 Supported cache stores
 
-- [-] InMemory
+- [ ] InMemory
 - [x] Filesystem
-- [-] Memcached
-- [-] Redis
+- [ ] Memcached
+- [ ] Redis
 
 
 ### LICENSE
