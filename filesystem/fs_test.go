@@ -1,19 +1,18 @@
 package filesystem
 
 import (
-	"flag"
-	"os"
-	"testing"
-	"time"
-
 	"crypto/md5"
 	"encoding/hex"
+	"flag"
+	"os"
 	"path/filepath"
+	"testing"
+	"time"
 
 	"github.com/adelowo/onecache"
 )
 
-var _ onecache.CacheStore = MustNewFSStore("./")
+var _ onecache.Store = MustNewFSStore("./")
 
 var fileCache *FSStore
 
