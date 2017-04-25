@@ -1,9 +1,9 @@
 package onecache
 
 import (
+	"reflect"
 	"testing"
 	"time"
-	"reflect"
 )
 
 func TestItem_IsExpired(t *testing.T) {
