@@ -23,7 +23,7 @@ type Item struct {
 }
 
 //Interface for all onecache store implementations
-type CacheStore interface {
+type Store interface {
 	Set(key string, data interface{}, expires time.Duration) error
 	Get(key string) (interface{}, error)
 	Delete(key string) error
