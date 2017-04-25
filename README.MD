@@ -7,7 +7,7 @@ Supported cache stores
 - [ ] InMemory
 - [x] Filesystem
 - [ ] Memcached
-- [ ] Redis
+- [x] Redis
 
 
 ### LICENSE
