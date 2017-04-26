@@ -55,3 +55,18 @@ func (i *InMemoryStore) Get(key string) (interface{}, error) {
 
 	return item.Data, nil
 }
+
+func (i *InMemoryStore) Delete(key string) error {
+	i.RLock()
+	defer i.RUnlock()
+
+	_, ok := i.data[key]
+
+	if !ok {
+		return onecache.ErrCacheMiss
+	}
+
+	delete(i.data, key)
+
+	return nil
+}
