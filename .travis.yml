@@ -4,6 +4,7 @@ sudo: false
 
 services:
   - redis-server
+  - memcached
   
 before_install:
   - go get github.com/mattn/goveralls
