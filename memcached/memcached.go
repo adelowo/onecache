@@ -53,3 +53,20 @@ func (m *MemcachedStore) Set(k string, data interface{}, expires time.Duration) 
 
 	return m.client.Set(item)
 }
+
+func (m *MemcachedStore) Get(k string) (interface{}, error) {
+
+	i, err := m.client.Get(m.key(k))
+
+	if err != nil {
+		return nil, err
+	}
+
+	item, err := onecache.BytesToItem(i.Value)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return item.Data, nil
+}
