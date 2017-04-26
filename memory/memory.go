@@ -36,3 +36,22 @@ func (i *InMemoryStore) Set(key string, data interface{}, expires time.Duration)
 
 	return nil
 }
+
+func (i *InMemoryStore) Get(key string) (interface{}, error) {
+	i.RLock()
+	defer i.RUnlock()
+
+	bytes, ok := i.data[key]
+
+	if !ok {
+		return nil, onecache.ErrCacheMiss
+	}
+
+	item, err := onecache.BytesToItem(bytes)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return item.Data, nil
+}
