@@ -91,3 +91,7 @@ func (m *MemcachedStore) adaptError(err error) error {
 
 	return err
 }
+
+func (m *MemcachedStore) Flush() error {
+	return m.client.DeleteAll()
+}
