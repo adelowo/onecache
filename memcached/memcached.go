@@ -71,6 +71,12 @@ func (m *MemcachedStore) Get(k string) (interface{}, error) {
 	return item.Data, nil
 }
 
+func (m *MemcachedStore) Delete(k string) error {
+	return m.adaptError(
+		m.client.Delete(
+			m.key(k)))
+}
+
 //Converts errors into onecache's types...
 //If the error doesn't have an equivalent in the onecache package, it is returned as is
 func (m *MemcachedStore) adaptError(err error) error {
