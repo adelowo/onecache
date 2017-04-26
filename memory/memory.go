@@ -49,6 +49,11 @@ func (i *InMemoryStore) Get(key string) (interface{}, error) {
 
 	item, err := onecache.BytesToItem(bytes)
 
+	if item.IsExpired() {
+		i.Delete(key)
+		return nil, onecache.ErrCacheMiss
+	}
+
 	if err != nil {
 		return nil, err
 	}
