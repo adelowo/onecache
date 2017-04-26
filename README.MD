@@ -10,7 +10,7 @@ Supported cache stores
 
 - [ ] InMemory
 - [x] Filesystem
-- [ ] Memcached
+- [x] Memcached
 - [x] Redis
 
 
