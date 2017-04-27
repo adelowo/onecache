@@ -56,3 +56,7 @@ func (r *RedisStore) Flush() error {
 func (r *RedisStore) key(k string) string {
 	return r.prefix + k
 }
+
+func (r *RedisStore) Increment(k string, steps int) error {
+	return r.client.IncrBy(r.key(k), int64(steps)).Err()
+}
