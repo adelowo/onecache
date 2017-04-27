@@ -114,3 +114,24 @@ func TestInMemoryStore_Delete_UnknownKey(t *testing.T) {
 			err)
 	}
 }
+
+func TestInMemoryStore_Increment(t *testing.T) {
+
+	expected := int32(52)
+
+	memoryStore.Set("number", int32(42), time.Second*10)
+
+	err := memoryStore.Increment("number", 10)
+
+	if err != nil {
+		t.Fatalf("An error occured while trying to increment the data.. %v", err)
+	}
+
+	val, _ := memoryStore.Get("number")
+
+	if !reflect.DeepEqual(expected, val) {
+		t.Fatalf(
+			"Incrementing cache data failed..\n Expected %d, got %d instead",
+			expected, val)
+	}
+}
