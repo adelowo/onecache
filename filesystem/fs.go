@@ -123,6 +123,10 @@ func (fs *FSStore) Increment(key string, steps int) error {
 
 	item.Data, err = onecache.Increment(item.Data, steps)
 
+	if err != nil {
+		return err
+	}
+
 	b, err = item.Bytes()
 
 	if err != nil {
