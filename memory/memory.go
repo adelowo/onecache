@@ -158,6 +158,9 @@ func (i *InMemoryStore) Decrement(key string, steps int) error {
 
 func (i *InMemoryStore) has(key string) bool {
 
+	i.lock.RLock()
+	defer i.lock.RUnlock()
+
 	_, ok := i.data[key]
 
 	return ok
