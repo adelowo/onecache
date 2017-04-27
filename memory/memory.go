@@ -75,3 +75,12 @@ func (i *InMemoryStore) Delete(key string) error {
 
 	return nil
 }
+
+func (i *InMemoryStore) Flush() error {
+	i.lock.RLock()
+	defer i.lock.RUnlock()
+
+	i.data = make(map[string][]byte)
+
+	return nil
+}
