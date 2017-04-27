@@ -59,11 +59,7 @@ func (fs *FSStore) Set(key string, data interface{}, expiresAt time.Duration) er
 		return err
 	}
 
-	if err = ioutil.WriteFile(path, b, defaultFilePerm); err != nil {
-		return err
-	}
-
-	return nil
+	return writeFile(path, b)
 }
 
 //Fetches a cache key.
@@ -107,4 +103,70 @@ func (fs *FSStore) filePathFor(key string) string {
 		string(hashSumAsString[0:2]),
 		string(hashSumAsString[2:4]),
 		string(hashSumAsString[4:6]), hashSumAsString)
+}
+
+func (fs *FSStore) Increment(key string, steps int) error {
+
+	path := fs.filePathFor(key)
+
+	b, err := ioutil.ReadFile(path)
+
+	if err != nil {
+		return err
+	}
+
+	item, err := onecache.BytesToItem(b)
+
+	if err != nil {
+		return err
+	}
+
+	item.Data, err = onecache.Increment(item.Data, steps)
+
+	if err != nil {
+		return err
+	}
+
+	b, err = item.Bytes()
+
+	if err != nil {
+		return err
+	}
+
+	return writeFile(path, b)
+}
+
+func (fs *FSStore) Decrement(key string, steps int) error {
+
+	path := fs.filePathFor(key)
+
+	b, err := ioutil.ReadFile(path)
+
+	if err != nil {
+		return err
+	}
+
+	item, err := onecache.BytesToItem(b)
+
+	if err != nil {
+		return err
+	}
+
+	item.Data, err = onecache.Decrement(item.Data, steps)
+
+	if err != nil {
+		return err
+	}
+
+	b, err = item.Bytes()
+
+	if err != nil {
+		return err
+	}
+
+	return writeFile(path, b)
+}
+
+func writeFile(path string, b []byte) error {
+	return ioutil.WriteFile(path, b, defaultFilePerm)
 }

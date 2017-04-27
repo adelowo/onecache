@@ -95,3 +95,15 @@ func (m *MemcachedStore) adaptError(err error) error {
 func (m *MemcachedStore) Flush() error {
 	return m.client.DeleteAll()
 }
+
+func (m *MemcachedStore) Increment(k string, steps int) error {
+	_, err := m.client.Increment(m.key(k), uint64(steps))
+
+	return m.adaptError(err)
+}
+
+func (m *MemcachedStore) Decrement(k string, steps int) error {
+	_, err := m.client.Decrement(m.key(k), uint64(steps))
+
+	return m.adaptError(err)
+}

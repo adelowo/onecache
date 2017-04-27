@@ -11,9 +11,12 @@ const (
 )
 
 var (
-	ErrCacheMiss         = errors.New("Key not found")
-	ErrCacheNotStored    = errors.New("Data not stored")
-	ErrCacheNotSupported = errors.New("Operation not supported")
+	ErrCacheMiss                  = errors.New("Key not found")
+	ErrCacheNotStored             = errors.New("Data not stored")
+	ErrCacheNotSupported          = errors.New("Operation not supported")
+	errCacheDataIntegerOperation  = errors.New("Data isn't an integer type")
+	ErrCacheDataCannotBeIncreased = errCacheDataIntegerOperation
+	ErrCacheDataCannotBeDecreased = errCacheDataIntegerOperation
 )
 
 //identifes a cached piece of data
@@ -28,4 +31,6 @@ type Store interface {
 	Get(key string) (interface{}, error)
 	Delete(key string) error
 	Flush() error
+	Increment(key string, steps int) error
+	Decrement(key string, steps int) error
 }

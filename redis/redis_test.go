@@ -112,3 +112,62 @@ func TestNewRedisStore_DefaultPrefixIsUsedIfNoneIsProvided(t *testing.T) {
 	}
 
 }
+
+func TestRedisStore_Increment(t *testing.T) {
+	var tests = []struct {
+		key      string
+		give     interface{}
+		expected interface{}
+		steps    int
+	}{
+		{"name", "40", "42", 2},
+		{"int", "100", "102", 2},
+	}
+
+	for _, v := range tests {
+		redisStore.Set(v.key, v.give, time.Second*2)
+		err := redisStore.Increment(v.key, v.steps)
+
+		val, _ := redisStore.Get(v.key)
+
+		if err != nil {
+			t.Fatalf("An error occurred... %v", err)
+		}
+
+		if !reflect.DeepEqual(v.expected, val) {
+			t.Fatalf(
+				"Differs.. Expected %v .\n Got %v instead",
+				v.expected, val)
+		}
+	}
+}
+
+func TestRedisStore_Decrement(t *testing.T) {
+	var tests = []struct {
+		key      string
+		give     interface{}
+		expected interface{}
+		steps    int
+	}{
+		{"name", "44", "42", 2},
+		{"int", "23", "21", 2},
+		{"int", "100", "0", 100},
+	}
+
+	for _, v := range tests {
+		redisStore.Set(v.key, v.give, time.Second*2)
+		err := redisStore.Decrement(v.key, v.steps)
+
+		val, _ := redisStore.Get(v.key)
+
+		if err != nil {
+			t.Fatalf("An error occurred... %v", err)
+		}
+
+		if !reflect.DeepEqual(v.expected, val) {
+			t.Fatalf(
+				"Differs.. Expected %v .\n Got %v instead",
+				v.expected, val)
+		}
+	}
+}
