@@ -80,7 +80,7 @@ func Increment(val interface{}, steps int) (interface{}, error) {
 		ret = strconv.Itoa(num)
 
 	default:
-		return -0, ErrCacheDataCannotBeIncreased
+		return -0, ErrCacheDataCannotBeIncreasedOrDecreased
 	}
 
 	return ret, nil
