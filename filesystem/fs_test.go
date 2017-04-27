@@ -6,6 +6,7 @@ import (
 	"flag"
 	"os"
 	"path/filepath"
+	"reflect"
 	"testing"
 	"time"
 
@@ -117,4 +118,22 @@ func TestFilePathForKey(t *testing.T) {
 	if x := fileCache.filePathFor("page_hits"); path != x {
 		t.Fatalf("Path differs.. Expected %s. Got %s instead", path, x)
 	}
+}
+
+func TestFSStore_Increment(t *testing.T) {
+
+	fileCache.Set("number", 41, time.Second*2)
+
+	err := fileCache.Increment("number", 1)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	val, _ := fileCache.Get("number")
+
+	if !reflect.DeepEqual(42, val) {
+		t.Fatalf("Expected %d.. Got %d", 43, val)
+	}
+
 }
