@@ -86,3 +86,7 @@ func Increment(val interface{}, steps int) (interface{}, error) {
 	return ret, nil
 
 }
+
+func Decrement(val interface{}, steps int) (interface{}, error) {
+	return Increment(val, steps*-1)
+}

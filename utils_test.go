@@ -41,6 +41,39 @@ func TestBytesToItem(t *testing.T) {
 
 }
 
+func TestDecrease(t *testing.T) {
+
+	var tests = []struct {
+		give     interface{}
+		expected interface{}
+		steps    interface{}
+	}{
+		{52, 42, 10},
+		{int32(32), int32(26), 6},
+		{int64(30), int64(20), 10},
+		{uint(8), uint(8), 0},
+		{uint8(15), uint8(7), 8},
+		{uint16(10), uint16(2), 8},
+		{uint32(40), uint32(10), 30},
+		{uint64(100), uint64(90), 10},
+		{"42", "41", 1},
+		{"30", "20", 10},
+	}
+
+	for _, v := range tests {
+		val, err := Decrement(v.give, v.steps.(int))
+
+		if err != nil {
+			t.Fatalf("An error occurred... %v", err)
+		}
+
+		if !reflect.DeepEqual(v.expected, val) {
+			t.Fatalf(
+				"Differs.. Expected %v .\n Got %v instead",
+				v.expected, val)
+		}
+	}
+}
 func TestIncrease(t *testing.T) {
 
 	var tests = []struct {
