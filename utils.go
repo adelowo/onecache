@@ -3,6 +3,7 @@ package onecache
 import (
 	"bytes"
 	"encoding/gob"
+	"strconv"
 	"time"
 )
 
@@ -66,8 +67,20 @@ func Increment(val interface{}, steps int) (interface{}, error) {
 	case uint64:
 		ret = val.(uint64) + uint64(steps)
 
+	case string:
+
+		num, err := strconv.Atoi(val.(string))
+
+		if err != nil {
+			return -0, err
+		}
+
+		num += steps
+
+		ret = strconv.Itoa(num)
+
 	default:
-		return 0, ErrCacheDataCannotBeIncreased
+		return -0, ErrCacheDataCannotBeIncreased
 	}
 
 	return ret, nil
