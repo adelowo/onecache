@@ -10,7 +10,7 @@ import (
 
 //Represents an inmemory store
 type InMemoryStore struct {
-	sync.RWMutex
+	lock sync.RWMutex
 	data map[string][]byte
 }
 
@@ -20,9 +20,9 @@ func NewInMemoryStore() *InMemoryStore {
 }
 
 func (i *InMemoryStore) Set(key string, data interface{}, expires time.Duration) error {
-	i.RLock()
+	i.lock.RLock()
 
-	defer i.RUnlock()
+	defer i.lock.RUnlock()
 
 	item := &onecache.Item{ExpiresAt: time.Now().Add(expires), Data: data}
 
@@ -38,8 +38,8 @@ func (i *InMemoryStore) Set(key string, data interface{}, expires time.Duration)
 }
 
 func (i *InMemoryStore) Get(key string) (interface{}, error) {
-	i.RLock()
-	defer i.RUnlock()
+	i.lock.RLock()
+	defer i.lock.RUnlock()
 
 	bytes, ok := i.data[key]
 
@@ -62,8 +62,8 @@ func (i *InMemoryStore) Get(key string) (interface{}, error) {
 }
 
 func (i *InMemoryStore) Delete(key string) error {
-	i.RLock()
-	defer i.RUnlock()
+	i.lock.RLock()
+	defer i.lock.RUnlock()
 
 	_, ok := i.data[key]
 
