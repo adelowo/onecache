@@ -154,4 +154,5 @@ func TestFSStore_Decrement(t *testing.T) {
 		t.Fatalf("Expected %d.. Got %d", 42, val)
 	}
 
+	fileCache.Flush()
 }
