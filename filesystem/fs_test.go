@@ -137,3 +137,21 @@ func TestFSStore_Increment(t *testing.T) {
 	}
 
 }
+
+func TestFSStore_Decrement(t *testing.T) {
+
+	fileCache.Set("number", 43, time.Second*2)
+
+	err := fileCache.Decrement("number", 1)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	val, _ := fileCache.Get("number")
+
+	if !reflect.DeepEqual(42, val) {
+		t.Fatalf("Expected %d.. Got %d", 42, val)
+	}
+
+}

@@ -136,6 +136,37 @@ func (fs *FSStore) Increment(key string, steps int) error {
 	return writeFile(path, b)
 }
 
+func (fs *FSStore) Decrement(key string, steps int) error {
+
+	path := fs.filePathFor(key)
+
+	b, err := ioutil.ReadFile(path)
+
+	if err != nil {
+		return err
+	}
+
+	item, err := onecache.BytesToItem(b)
+
+	if err != nil {
+		return err
+	}
+
+	item.Data, err = onecache.Decrement(item.Data, steps)
+
+	if err != nil {
+		return err
+	}
+
+	b, err = item.Bytes()
+
+	if err != nil {
+		return err
+	}
+
+	return writeFile(path, b)
+}
+
 func writeFile(path string, b []byte) error {
 	return ioutil.WriteFile(path, b, defaultFilePerm)
 }
