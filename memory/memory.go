@@ -3,9 +3,10 @@
 package memory
 
 import (
-	"github.com/adelowo/onecache"
 	"sync"
 	"time"
+
+	"github.com/adelowo/onecache"
 )
 
 //Represents an inmemory store
