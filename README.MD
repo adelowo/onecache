@@ -29,6 +29,8 @@ Supported cache stores
 
 <div id="eg"></div>
 
+> Have a look at the [interface](https://github.com/adelowo/onecache/blob/master/types.go#L27-L35) for all stores to get an idea of all available methods
+
 - Filesystem
 
 ```go
