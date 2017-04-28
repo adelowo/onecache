@@ -3,8 +3,21 @@
 [![Coverage Status](https://coveralls.io/repos/github/adelowo/onecache/badge.svg)](https://coveralls.io/github/adelowo/onecache)
 [![Build Status](https://img.shields.io/travis/adelowo/onecache/master.svg?style=flat-square)](https://travis-ci.org/adelowo/onecache.svg?branch=master)
 
+- [Installation](#install)
+- [Supported stores](#stores)
+- [Examples](#eg)
 
-> WIP 
+<div id="install"></div>
+
+### Installation
+
+```go
+
+$ go get -u github.com/adelowo/onecache
+
+```
+
+<div id="stores"></div>
 
 Supported cache stores
 
@@ -13,6 +26,49 @@ Supported cache stores
 - [x] Memcached
 - [x] Redis
 
+
+<div id="eg"></div>
+
+- Filesystem
+
+```go
+
+var fs onecache.Store
+
+fs = filesystem.MustNewFSStore("/some/writeable/directory") //Would be created if it does not exists
+
+err := fs.Set("profile", "Used to be Human", time.Second*60)
+	 
+fmt.Println(err)
+	 
+fmt.Println(fs.Get("profile")) // "Used to be Human, nil"
+
+fmt.Println(fs.Flush())
+
+```
+
+- InMemory
+
+```go
+
+
+mem := memory.newInMemoryStore()
+	
+fmt.Println(mem.Set("name", "Lanre", time.Minute*10))
+
+fmt.Println(mem.Get("name"))
+fmt.Println(mem.Get("unknown"))
+
+fmt.Println(mem.Set("occupation", "Troll", time.Second))
+
+fmt.Println(mem.Flush())
+
+fmt.Println(mem.Set("n", 2, time.Minute*1))
+fmt.Println(mem.Get("n"))
+fmt.Println(mem.Increment("n", 10))
+fmt.Println(mem.Get("n"))
+
+```
 
 ### LICENSE
 MIT
