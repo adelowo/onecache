@@ -1,4 +1,4 @@
-### OneCache - The only caching library you would ever need in Go
+### OneCache - A Go caching Library
 
 [![Coverage Status](https://coveralls.io/repos/github/adelowo/onecache/badge.svg)](https://coveralls.io/github/adelowo/onecache)
 [![Build Status](https://img.shields.io/travis/adelowo/onecache/master.svg?style=flat-square)](https://travis-ci.org/adelowo/onecache.svg?branch=master)
@@ -33,6 +33,10 @@ Supported cache stores
 
 ```go
 
+import (
+	"github.com/adelowo/onecache/filesystem"
+)
+
 var fs onecache.Store
 
 fs = filesystem.MustNewFSStore("/some/writeable/directory") //Would be created if it does not exists
@@ -47,10 +51,61 @@ fmt.Println(fs.Flush())
 
 ```
 
+- Redis 
+
+```go
+
+import (
+	"github.com/adelowo/onecache/redis"
+	r "github.com/go-redis/redis"
+)
+
+opt := &r.Options{
+	Addr:     "localhost:6379",
+	Password: "", // no password set
+	DB:       0,  // use default DB
+}
+
+redisStore := redis.NewRedisStore(opt, "")
+
+fmt.Println(redisStore.Set("profile", "Github\n", time.Minute*10))
+
+val, err := redisStore.Get("profile")
+
+fmt.Println(val, err)
+
+fmt.Println(redisStore.Flush())
+
+
+```
+
+- Memcached
+
+```go
+
+import(
+	"github.com/bradfitz/gomemcache/memcache"
+	"github.com/adelowo/onecache/memcached"
+)
+
+m := memcached.NewMemcachedStore(memcache.New("127.0.0.1:11211"),"",)
+
+fmt.Println(m.Set("name", "Lanre", onecache.EXPIRES_DEFAULT))
+
+fmt.Println(m.Get("name"))
+
+fmt.Println(m.Flush())
+
+
+```
+
 - InMemory
 
 ```go
 
+import (
+	"github.com/adelowo/onecache/memory"
+)
 
 mem := memory.newInMemoryStore()
 	
