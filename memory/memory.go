@@ -55,6 +55,7 @@ func (i *InMemoryStore) Get(key string) ([]byte, error) {
 	}
 
 	if item.IsExpired() {
+		i.Delete(key)
 		return nil, onecache.ErrCacheMiss
 	}
 
@@ -76,91 +77,11 @@ func (i *InMemoryStore) Delete(key string) error {
 	return nil
 }
 
-//func (i *InMemoryStore) Flush() error {
-//	i.lock.RLock()
-//	defer i.lock.RUnlock()
-//
-//	i.data = make(map[string][]byte)
-//
-//	return nil
-//}
-//
-//func (i *InMemoryStore) Increment(key string, steps int) error {
-//
-//	i.lock.RLock()
-//	defer i.lock.RUnlock()
-//
-//	if !i.has(key) {
-//		return onecache.ErrCacheMiss
-//	}
-//
-//	bytes := i.data[key]
-//
-//	item, err := onecache.BytesToItem(bytes)
-//
-//	if err != nil {
-//		return err
-//	}
-//
-//	item.Data, err = onecache.Increment(item.Data, steps)
-//
-//	if err != nil {
-//		return err
-//	}
-//
-//	b, err := item.Bytes()
-//
-//	if err != nil {
-//		return err
-//	}
-//
-//	i.data[key] = b
-//
-//	return nil
-//
-//}
-//
-//func (i *InMemoryStore) Decrement(key string, steps int) error {
-//
-//	i.lock.RLock()
-//	defer i.lock.RUnlock()
-//
-//	if !i.has(key) {
-//		return onecache.ErrCacheMiss
-//	}
-//
-//	bytes := i.data[key]
-//
-//	item, err := onecache.BytesToItem(bytes)
-//
-//	if err != nil {
-//		return err
-//	}
-//
-//	item.Data, err = onecache.Decrement(item.Data, steps)
-//
-//	if err != nil {
-//		return err
-//	}
-//
-//	b, err := item.Bytes()
-//
-//	if err != nil {
-//		return err
-//	}
-//
-//	i.data[key] = b
-//
-//	return nil
-//
-//}
-//
-//func (i *InMemoryStore) has(key string) bool {
-//
-//	i.lock.RLock()
-//	defer i.lock.RUnlock()
-//
-//	_, ok := i.data[key]
-//
-//	return ok
-//}
+func (i *InMemoryStore) Flush() error {
+	i.lock.RLock()
+	defer i.lock.RUnlock()
+
+	i.data = make(map[string][]byte)
+
+	return nil
+}

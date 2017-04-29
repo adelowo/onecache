@@ -27,9 +27,7 @@ type Item struct {
 //Interface for all onecache store implementations
 type Store interface {
 	Set(key string, data []byte, expires time.Duration) error
-	//Get(key string) ([]byte, error)
-	//Delete(key string) error
-	//Flush() error
-	//Increment(key string, steps int) error
-	//Decrement(key string, steps int) error
+	Get(key string) ([]byte, error)
+	Delete(key string) error
+	Flush() error
 }
