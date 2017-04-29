@@ -11,23 +11,23 @@ import (
 
 //Represents an inmemory store
 type InMemoryStore struct {
+	b    onecache.Marshaller
 	lock sync.RWMutex
 	data map[string][]byte
 }
 
 //Returns a new instance of the Inmemory store
 func NewInMemoryStore() *InMemoryStore {
-	return &InMemoryStore{data: make(map[string][]byte)}
+	return &InMemoryStore{data: make(map[string][]byte), b: onecache.NewBytesItemMarshaller()}
 }
 
-func (i *InMemoryStore) Set(key string, data interface{}, expires time.Duration) error {
+func (i *InMemoryStore) Set(key string, data []byte, expires time.Duration) error {
 	i.lock.RLock()
-
 	defer i.lock.RUnlock()
 
 	item := &onecache.Item{ExpiresAt: time.Now().Add(expires), Data: data}
 
-	b, err := item.Bytes()
+	b, err := i.b.MarshalBytes(item)
 
 	if err != nil {
 		return err
@@ -38,7 +38,7 @@ func (i *InMemoryStore) Set(key string, data interface{}, expires time.Duration)
 	return nil
 }
 
-func (i *InMemoryStore) Get(key string) (interface{}, error) {
+func (i *InMemoryStore) Get(key string) ([]byte, error) {
 	i.lock.RLock()
 	defer i.lock.RUnlock()
 
@@ -48,15 +48,14 @@ func (i *InMemoryStore) Get(key string) (interface{}, error) {
 		return nil, onecache.ErrCacheMiss
 	}
 
-	item, err := onecache.BytesToItem(bytes)
-
-	if item.IsExpired() {
-		i.Delete(key)
-		return nil, onecache.ErrCacheMiss
-	}
+	item, err := i.b.UnMarshallBytes(bytes)
 
 	if err != nil {
 		return nil, err
+	}
+
+	if item.IsExpired() {
+		return nil, onecache.ErrCacheMiss
 	}
 
 	return item.Data, nil
@@ -77,91 +76,91 @@ func (i *InMemoryStore) Delete(key string) error {
 	return nil
 }
 
-func (i *InMemoryStore) Flush() error {
-	i.lock.RLock()
-	defer i.lock.RUnlock()
-
-	i.data = make(map[string][]byte)
-
-	return nil
-}
-
-func (i *InMemoryStore) Increment(key string, steps int) error {
-
-	i.lock.RLock()
-	defer i.lock.RUnlock()
-
-	if !i.has(key) {
-		return onecache.ErrCacheMiss
-	}
-
-	bytes := i.data[key]
-
-	item, err := onecache.BytesToItem(bytes)
-
-	if err != nil {
-		return err
-	}
-
-	item.Data, err = onecache.Increment(item.Data, steps)
-
-	if err != nil {
-		return err
-	}
-
-	b, err := item.Bytes()
-
-	if err != nil {
-		return err
-	}
-
-	i.data[key] = b
-
-	return nil
-
-}
-
-func (i *InMemoryStore) Decrement(key string, steps int) error {
-
-	i.lock.RLock()
-	defer i.lock.RUnlock()
-
-	if !i.has(key) {
-		return onecache.ErrCacheMiss
-	}
-
-	bytes := i.data[key]
-
-	item, err := onecache.BytesToItem(bytes)
-
-	if err != nil {
-		return err
-	}
-
-	item.Data, err = onecache.Decrement(item.Data, steps)
-
-	if err != nil {
-		return err
-	}
-
-	b, err := item.Bytes()
-
-	if err != nil {
-		return err
-	}
-
-	i.data[key] = b
-
-	return nil
-
-}
-
-func (i *InMemoryStore) has(key string) bool {
-
-	i.lock.RLock()
-	defer i.lock.RUnlock()
-
-	_, ok := i.data[key]
-
-	return ok
-}
+//func (i *InMemoryStore) Flush() error {
+//	i.lock.RLock()
+//	defer i.lock.RUnlock()
+//
+//	i.data = make(map[string][]byte)
+//
+//	return nil
+//}
+//
+//func (i *InMemoryStore) Increment(key string, steps int) error {
+//
+//	i.lock.RLock()
+//	defer i.lock.RUnlock()
+//
+//	if !i.has(key) {
+//		return onecache.ErrCacheMiss
+//	}
+//
+//	bytes := i.data[key]
+//
+//	item, err := onecache.BytesToItem(bytes)
+//
+//	if err != nil {
+//		return err
+//	}
+//
+//	item.Data, err = onecache.Increment(item.Data, steps)
+//
+//	if err != nil {
+//		return err
+//	}
+//
+//	b, err := item.Bytes()
+//
+//	if err != nil {
+//		return err
+//	}
+//
+//	i.data[key] = b
+//
+//	return nil
+//
+//}
+//
+//func (i *InMemoryStore) Decrement(key string, steps int) error {
+//
+//	i.lock.RLock()
+//	defer i.lock.RUnlock()
+//
+//	if !i.has(key) {
+//		return onecache.ErrCacheMiss
+//	}
+//
+//	bytes := i.data[key]
+//
+//	item, err := onecache.BytesToItem(bytes)
+//
+//	if err != nil {
+//		return err
+//	}
+//
+//	item.Data, err = onecache.Decrement(item.Data, steps)
+//
+//	if err != nil {
+//		return err
+//	}
+//
+//	b, err := item.Bytes()
+//
+//	if err != nil {
+//		return err
+//	}
+//
+//	i.data[key] = b
+//
+//	return nil
+//
+//}
+//
+//func (i *InMemoryStore) has(key string) bool {
+//
+//	i.lock.RLock()
+//	defer i.lock.RUnlock()
+//
+//	_, ok := i.data[key]
+//
+//	return ok
+//}
