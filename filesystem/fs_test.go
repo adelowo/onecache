@@ -3,6 +3,7 @@ package filesystem
 import (
 	"crypto/md5"
 	"encoding/hex"
+	"errors"
 	"flag"
 	"os"
 	"path/filepath"
@@ -34,9 +35,11 @@ func TestMustNewFSStore(t *testing.T) {
 	_ = MustNewFSStore("/hh")
 }
 
+var sampleData = []byte("Lanre")
+
 func TestFSStore_Set(t *testing.T) {
 
-	err := fileCache.Set("name", "Lanre", time.Minute*2)
+	err := fileCache.Set("name", sampleData, time.Minute*2)
 
 	if err != nil {
 		t.Fatal(err)
@@ -51,14 +54,10 @@ func TestFSStore_Get(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	data, ok := val.(string)
-
-	if !ok {
-		t.Fatal("Cached data should return a string")
-	}
-
-	if data != "Lanre" {
-		t.Fatal("OOPS")
+	if !reflect.DeepEqual(val, sampleData) {
+		t.Fatalf(
+			`Values are not equal.. Expected %v \n
+			Got %v`, sampleData, val)
 	}
 }
 
@@ -76,7 +75,7 @@ func TestFSStore_GetUnknownKey(t *testing.T) {
 
 func TestFSStore_GarbageCollection(t *testing.T) {
 
-	err := fileCache.Set("xyz", "Elon Musk", onecache.EXPIRES_DEFAULT)
+	err := fileCache.Set("xyz", []byte("Elon Musk"), onecache.EXPIRES_DEFAULT)
 
 	if err != nil {
 		t.Fatalf("An error occurred... %v", err)
@@ -90,13 +89,6 @@ func TestFSStore_GarbageCollection(t *testing.T) {
 
 	if data != nil {
 		t.Fatal("Garbage collected item is supposed to be empty")
-	}
-}
-
-func TestFSStore_Delete(t *testing.T) {
-
-	if err := fileCache.Delete("name"); err != nil {
-		t.Fatalf("Could not delete the cached data... %v", err)
 	}
 }
 
@@ -120,39 +112,57 @@ func TestFilePathForKey(t *testing.T) {
 	}
 }
 
-func TestFSStore_Increment(t *testing.T) {
+type bytesItemMarshallerMock struct {
+}
 
-	fileCache.Set("number", 41, time.Second*2)
+func (b *bytesItemMarshallerMock) MarshalBytes(i *onecache.Item) ([]byte, error) {
+	return nil, errors.New("Yup an error occurred")
+}
 
-	err := fileCache.Increment("number", 1)
+func (b *bytesItemMarshallerMock) UnMarshallBytes(data []byte) (*onecache.Item, error) {
+	return nil, errors.New("Yet another error")
+}
 
-	if err != nil {
-		t.Fatal(err)
-	}
+func TestFSStore_GetFailsBecauseOfBytesMarshalling(t *testing.T) {
 
-	val, _ := fileCache.Get("number")
+	fileCache.Set("test", []byte("test"), time.Second*1)
 
-	if !reflect.DeepEqual(42, val) {
-		t.Fatalf("Expected %d.. Got %d", 43, val)
+	fs := &FSStore{"./../cache", &bytesItemMarshallerMock{}}
+
+	_, err := fs.Get("test")
+
+	if err == nil {
+		t.Fatalf(
+			`Expected a cache miss.. Got %v`, err)
 	}
 
 }
 
-func TestFSStore_Decrement(t *testing.T) {
+func TestFSStore_SetFailsBecauseOfBytesMarshalling(t *testing.T) {
 
-	fileCache.Set("number", 43, time.Second*2)
+	fs := &FSStore{"./../cache", &bytesItemMarshallerMock{}}
 
-	err := fileCache.Decrement("number", 1)
+	err := fs.Set("test", []byte("test"), time.Nanosecond*4)
 
-	if err != nil {
-		t.Fatal(err)
+	if err == nil {
+		t.Fatalf(
+			`Expected an error from bytes marshalling.. Got %v`, err)
 	}
 
-	val, _ := fileCache.Get("number")
+}
 
-	if !reflect.DeepEqual(42, val) {
-		t.Fatalf("Expected %d.. Got %d", 42, val)
+func TestFSStore_Delete(t *testing.T) {
+
+	if err := fileCache.Delete("name"); err != nil {
+		t.Fatalf("Could not delete the cached data... %v", err)
 	}
+}
 
-	fileCache.Flush()
+func TestFSStore_SetFailsWhenMakingUseOfAnUnwriteableDirectory(t *testing.T) {
+	fileCache.baseDir = "/" //change directory to the OS root
+
+	if err := fileCache.Set("test", []byte("test"), time.Microsecond*4); err == nil {
+		t.Fatal(
+			`An error was supposed to occur because the root directory isn't writeable`)
+	}
 }
