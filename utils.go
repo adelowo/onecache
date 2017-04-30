@@ -7,27 +7,28 @@ import (
 	"time"
 )
 
-
 //Helper method to check if an item is expired.
 //Current usecase for this is for garbage collection
 func (i *Item) IsExpired() bool {
 	return time.Now().After(i.ExpiresAt)
 }
 
-type Marshaller interface {
-	UnMarshallBytes(data []byte) (*Item, error)
-	MarshalBytes(i *Item) ([]byte, error)
+type Serializer interface {
+	Serialize(i interface{}) ([]byte, error)
+	DeSerialize(data []byte, i interface{}) error
 }
 
-func NewBytesItemMarshaller() *BytesItemMarshaller {
-	return &BytesItemMarshaller{}
+func NewCacheSerializer() *CacheSerializer {
+	return &CacheSerializer{}
 }
 
-type BytesItemMarshaller struct {
-
+//Helper to serialize and deserialize types
+type CacheSerializer struct {
 }
 
-func (b *BytesItemMarshaller) MarshalBytes(i *Item) ([]byte, error){
+//Convert a given type into a byte array
+//Caveat -> Types you create might have to be registered with the encoding/gob package
+func (b *CacheSerializer) Serialize(i interface{}) ([]byte, error) {
 	var buf bytes.Buffer
 
 	enc := gob.NewEncoder(&buf)
@@ -39,12 +40,9 @@ func (b *BytesItemMarshaller) MarshalBytes(i *Item) ([]byte, error){
 	return buf.Bytes(), nil
 }
 
-func (b *BytesItemMarshaller) UnMarshallBytes(data []byte) (*Item, error) {
-	i := new(Item)
-
-	err := gob.NewDecoder(bytes.NewBuffer(data)).Decode(i)
-
-	return i, err
+//Writes a byte array into a type.
+func (b *CacheSerializer) DeSerialize(data []byte, i interface{}) error {
+	return gob.NewDecoder(bytes.NewBuffer(data)).Decode(i)
 }
 
 func Increment(val interface{}, steps int) (interface{}, error) {
