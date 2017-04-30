@@ -43,13 +43,13 @@ var fs onecache.Store
 
 fs = filesystem.MustNewFSStore("/some/writeable/directory") //Would be created if it does not exists
 
-err := fs.Set("profile", "Used to be Human", time.Second*60)
+err := fs.Set("profile", []byte("Used to be Human"), time.Second*60)
 	 
 fmt.Println(err)
 	 
-fmt.Println(fs.Get("profile")) // "Used to be Human, nil"
+fmt.Println(fs.Get("profile"))
 
-fmt.Println(fs.Flush())
+fmt.Println(fs.Flush()) //Clear out all cached data
 
 ```
 
@@ -70,7 +70,7 @@ opt := &r.Options{
 
 redisStore := redis.NewRedisStore(opt, "")
 
-fmt.Println(redisStore.Set("profile", "Github\n", time.Minute*10))
+fmt.Println(redisStore.Set("profile", []byte("Github\n"), time.Minute*10))
 
 val, err := redisStore.Get("profile")
 
@@ -92,7 +92,7 @@ import(
 
 m := memcached.NewMemcachedStore(memcache.New("127.0.0.1:11211"),"",)
 
-fmt.Println(m.Set("name", "Lanre", onecache.EXPIRES_DEFAULT))
+fmt.Println(m.Set("name", []byte("Lanre"), onecache.EXPIRES_DEFAULT))
 
 fmt.Println(m.Get("name"))
 
@@ -111,19 +111,14 @@ import (
 
 mem := memory.newInMemoryStore()
 	
-fmt.Println(mem.Set("name", "Lanre", time.Minute*10))
+fmt.Println(mem.Set("name", []byte("Lanre"), time.Minute*10))
 
 fmt.Println(mem.Get("name"))
 fmt.Println(mem.Get("unknown"))
 
-fmt.Println(mem.Set("occupation", "Troll", time.Second))
+fmt.Println(mem.Set("hobby", []byte("Trolling"), time.Second))
 
 fmt.Println(mem.Flush())
-
-fmt.Println(mem.Set("n", 2, time.Minute*1))
-fmt.Println(mem.Get("n"))
-fmt.Println(mem.Increment("n", 10))
-fmt.Println(mem.Get("n"))
 
 ```
 
