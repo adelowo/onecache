@@ -35,20 +35,20 @@ func TestInMemoryStore_Set(t *testing.T) {
 	}
 }
 
-type bytesItemMarshallerMock struct {
+type mockSerializer struct {
 }
 
-func (b *bytesItemMarshallerMock) MarshalBytes(i *onecache.Item) ([]byte, error) {
+func (b *mockSerializer) Serialize(i interface{}) ([]byte, error) {
 	return nil, errors.New("Yup an error occurred")
 }
 
-func (b *bytesItemMarshallerMock) UnMarshallBytes(data []byte) (*onecache.Item, error) {
-	return nil, errors.New("Yet another error")
+func (b *mockSerializer) DeSerialize(data []byte, i interface{}) (error) {
+	return errors.New("Yet another error")
 }
 
 func TestInMemoryStore_SetErrorOccursWhenMarshallingItemToByte(t *testing.T) {
 
-	m := &InMemoryStore{data: make(map[string][]byte, 100), b: &bytesItemMarshallerMock{}}
+	m := &InMemoryStore{data: make(map[string][]byte, 100), b: &mockSerializer{}}
 
 	err := m.Set("n", []byte("ERROR"), time.Second*2)
 
@@ -88,7 +88,7 @@ func TestInMemoryStore_Get_ErrorOccurrsWhileUnmarshallingToBytes(t *testing.T) {
 
 	f["name"] = []byte("Onecache")
 
-	m := &InMemoryStore{data: f, b: &bytesItemMarshallerMock{}}
+	m := &InMemoryStore{data: f, b: &mockSerializer{}}
 
 	val, err := m.Get("name")
 

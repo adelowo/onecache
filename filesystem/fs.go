@@ -25,7 +25,7 @@ func createDirectory(dir string) error {
 
 type FSStore struct {
 	baseDir string
-	b       onecache.Marshaller
+	b       onecache.Serializer
 }
 
 //Returns an initialized Filesystem Cache
@@ -41,7 +41,7 @@ func MustNewFSStore(baseDir string) *FSStore {
 		}
 	}
 
-	return &FSStore{baseDir, onecache.NewBytesItemMarshaller()}
+	return &FSStore{baseDir, onecache.NewCacheSerializer()}
 }
 
 func (fs *FSStore) Set(key string, data []byte, expiresAt time.Duration) error {
@@ -54,7 +54,7 @@ func (fs *FSStore) Set(key string, data []byte, expiresAt time.Duration) error {
 
 	i := &onecache.Item{ExpiresAt: time.Now().Add(expiresAt), Data: data}
 
-	b, err := fs.b.MarshalBytes(i)
+	b, err := fs.b.Serialize(i)
 
 	if err != nil {
 		return err
@@ -73,7 +73,9 @@ func (fs *FSStore) Get(key string) ([]byte, error) {
 		return nil, err
 	}
 
-	i, err := fs.b.UnMarshallBytes(b)
+	i := new(onecache.Item)
+
+	err = fs.b.DeSerialize(b,i)
 
 	if err != nil {
 		return nil, err

@@ -11,14 +11,14 @@ import (
 
 //Represents an inmemory store
 type InMemoryStore struct {
-	b    onecache.Marshaller
+	b    onecache.Serializer
 	lock sync.RWMutex
 	data map[string][]byte
 }
 
 //Returns a new instance of the Inmemory store
 func NewInMemoryStore() *InMemoryStore {
-	return &InMemoryStore{data: make(map[string][]byte), b: onecache.NewBytesItemMarshaller()}
+	return &InMemoryStore{data: make(map[string][]byte), b: onecache.NewCacheSerializer()}
 }
 
 func (i *InMemoryStore) Set(key string, data []byte, expires time.Duration) error {
@@ -27,7 +27,7 @@ func (i *InMemoryStore) Set(key string, data []byte, expires time.Duration) erro
 
 	item := &onecache.Item{ExpiresAt: time.Now().Add(expires), Data: data}
 
-	b, err := i.b.MarshalBytes(item)
+	b, err := i.b.Serialize(item)
 
 	if err != nil {
 		return err
@@ -48,7 +48,9 @@ func (i *InMemoryStore) Get(key string) ([]byte, error) {
 		return nil, onecache.ErrCacheMiss
 	}
 
-	item, err := i.b.UnMarshallBytes(bytes)
+	item := new(onecache.Item)
+
+	err := i.b.DeSerialize(bytes, item)
 
 	if err != nil {
 		return nil, err

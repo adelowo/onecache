@@ -112,22 +112,22 @@ func TestFilePathForKey(t *testing.T) {
 	}
 }
 
-type bytesItemMarshallerMock struct {
+type mockSerializer struct {
 }
 
-func (b *bytesItemMarshallerMock) MarshalBytes(i *onecache.Item) ([]byte, error) {
+func (b *mockSerializer) Serialize(i interface{}) ([]byte, error) {
 	return nil, errors.New("Yup an error occurred")
 }
 
-func (b *bytesItemMarshallerMock) UnMarshallBytes(data []byte) (*onecache.Item, error) {
-	return nil, errors.New("Yet another error")
+func (b *mockSerializer) DeSerialize(data []byte, i interface{}) (error) {
+	return errors.New("Yet another error")
 }
 
 func TestFSStore_GetFailsBecauseOfBytesMarshalling(t *testing.T) {
 
 	fileCache.Set("test", []byte("test"), time.Second*1)
 
-	fs := &FSStore{"./../cache", &bytesItemMarshallerMock{}}
+	fs := &FSStore{"./../cache", &mockSerializer{}}
 
 	_, err := fs.Get("test")
 
@@ -140,7 +140,7 @@ func TestFSStore_GetFailsBecauseOfBytesMarshalling(t *testing.T) {
 
 func TestFSStore_SetFailsBecauseOfBytesMarshalling(t *testing.T) {
 
-	fs := &FSStore{"./../cache", &bytesItemMarshallerMock{}}
+	fs := &FSStore{"./../cache", &mockSerializer{}}
 
 	err := fs.Set("test", []byte("test"), time.Nanosecond*4)
 
