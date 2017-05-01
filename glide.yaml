@@ -2,7 +2,7 @@ package: github.com/adelowo/onecache
 owners:
 - name: Lanre Adelowo
   email: me@lanreadelowo.com
-homepage: https://lanreadelowo.com
+  homepage: https://lanreadelowo.com
 
 import:
 - package: github.com/bradfitz/gomemcache
