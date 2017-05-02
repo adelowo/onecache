@@ -17,6 +17,8 @@ $ go get -u github.com/adelowo/onecache
 
 ```
 
+> Version 2 was recently released and it fixed a number of issues as per how data was cached (the main bone of contention being the use of `interface{}`. Take a look at this [issue](https://github.com/adelowo/onecache/issues/7)). Version 1 would still be maintained going forward ([branch here](https://github.com/adelowo/onecache/tree/1.x)) but newer development would be based on v2.
+
 <div id="stores"></div>
 
 Supported cache stores
