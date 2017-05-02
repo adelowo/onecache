@@ -22,8 +22,8 @@ func NewInMemoryStore() *InMemoryStore {
 }
 
 func (i *InMemoryStore) Set(key string, data []byte, expires time.Duration) error {
-	i.lock.RLock()
-	defer i.lock.RUnlock()
+	i.lock.Lock()
+	defer i.lock.Unlock()
 
 	item := &onecache.Item{ExpiresAt: time.Now().Add(expires), Data: data}
 
@@ -57,7 +57,7 @@ func (i *InMemoryStore) Get(key string) ([]byte, error) {
 	}
 
 	if item.IsExpired() {
-		i.Delete(key)
+		go i.Delete(key) //Prevent a deadlock since the mutex is still locked here
 		return nil, onecache.ErrCacheMiss
 	}
 
@@ -65,8 +65,8 @@ func (i *InMemoryStore) Get(key string) ([]byte, error) {
 }
 
 func (i *InMemoryStore) Delete(key string) error {
-	i.lock.RLock()
-	defer i.lock.RUnlock()
+	i.lock.Lock()
+	defer i.lock.Unlock()
 
 	_, ok := i.data[key]
 
@@ -80,8 +80,8 @@ func (i *InMemoryStore) Delete(key string) error {
 }
 
 func (i *InMemoryStore) Flush() error {
-	i.lock.RLock()
-	defer i.lock.RUnlock()
+	i.lock.Lock()
+	defer i.lock.Unlock()
 
 	i.data = make(map[string][]byte)
 
