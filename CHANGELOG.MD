@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.1 (2017-05-02)
+
+- Serializer would now refuse to encode/decode values that are already of `[]byte`. For decoding, it must be a pointer to the byte array.
+- Fixed wrong usage of protetion with a mutex in the memory store
+
 ## 2.0.0 (2017-05-01)
 
 - This was a big update and while it came too soon. It was as a result of some design tradeoff v1.0.0 made.
