@@ -55,7 +55,7 @@ fmt.Println(fs.Flush()) //Clear out all cached data
 
 ```
 
-> You are not limited to storing primitives ...Please check out the [examples]((https://github.com/adelowo/onecache/blob/master/_examples/main.go))
+> You are not limited to storing primitives ...Please check out the [examples](https://github.com/adelowo/onecache/blob/master/_examples/main.go)
 
 - Redis 
 
