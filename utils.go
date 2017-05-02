@@ -47,6 +47,12 @@ func (b *CacheSerializer) Serialize(i interface{}) ([]byte, error) {
 
 //Writes a byte array into a type.
 func (b *CacheSerializer) DeSerialize(data []byte, i interface{}) error {
+
+	if b, ok := i.(*[]byte); ok {
+		*b = data
+		return nil
+	}
+
 	return gob.NewDecoder(bytes.NewBuffer(data)).Decode(i)
 }
 
