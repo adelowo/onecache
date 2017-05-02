@@ -29,6 +29,11 @@ type CacheSerializer struct {
 //Convert a given type into a byte array
 //Caveat -> Types you create might have to be registered with the encoding/gob package
 func (b *CacheSerializer) Serialize(i interface{}) ([]byte, error) {
+
+	if b, ok := i.([]byte); ok {
+		return b, nil
+	}
+
 	var buf bytes.Buffer
 
 	enc := gob.NewEncoder(&buf)
