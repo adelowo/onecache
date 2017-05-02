@@ -8,7 +8,7 @@ import (
 
 func TestItem_IsExpired(t *testing.T) {
 
-	item := &Item{ExpiresAt: time.Now().Add(-2 * time.Minute), Data: "Ping-Pong"}
+	item := &Item{ExpiresAt: time.Now().Add(-2 * time.Minute), Data: []byte("Ping-Pong")}
 
 	if !item.IsExpired() {
 		t.Fatal("Item should be expired since it's expiration date is set 2 minutes backwards")
@@ -17,15 +17,19 @@ func TestItem_IsExpired(t *testing.T) {
 
 func TestBytesToItem(t *testing.T) {
 
-	item := &Item{ExpiresAt: time.Now(), Data: "Ping-Pong"}
+	serializer := NewCacheSerializer()
 
-	b, err := item.Bytes()
+	item := &Item{ExpiresAt: time.Now(), Data: []byte("Ping-Pong")}
+
+	b, err := serializer.Serialize(item)
 
 	if err != nil {
 		t.Error(err)
 	}
 
-	i, err := BytesToItem(b)
+	i := new(Item)
+
+	err = serializer.DeSerialize(b, i)
 
 	if err != nil {
 		t.Error(err)

@@ -21,15 +21,13 @@ var (
 //identifes a cached piece of data
 type Item struct {
 	ExpiresAt time.Time
-	Data      interface{}
+	Data      []byte
 }
 
 //Interface for all onecache store implementations
 type Store interface {
-	Set(key string, data interface{}, expires time.Duration) error
-	Get(key string) (interface{}, error)
+	Set(key string, data []byte, expires time.Duration) error
+	Get(key string) ([]byte, error)
 	Delete(key string) error
 	Flush() error
-	Increment(key string, steps int) error
-	Decrement(key string, steps int) error
 }

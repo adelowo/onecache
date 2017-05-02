@@ -1,4 +1,4 @@
-//Package memcached is a memcached store for onecache
+//Package memcached is a cache implementation for onecache which uses memcached
 package memcached
 
 import (
@@ -35,40 +35,27 @@ func (m *MemcachedStore) key(k string) string {
 	return m.prefix + k
 }
 
-func (m *MemcachedStore) Set(k string, data interface{}, expires time.Duration) error {
-
-	i := &onecache.Item{Data: data}
-
-	b, err := i.Bytes()
-
-	if err != nil {
-		return err
-	}
+func (m *MemcachedStore) Set(k string, data []byte, expires time.Duration) error {
 
 	item := &memcache.Item{
 		Key:        m.key(k),
-		Value:      b,
+		Value:      data,
 		Expiration: int32(expires / time.Second),
 	}
 
 	return m.client.Set(item)
 }
 
-func (m *MemcachedStore) Get(k string) (interface{}, error) {
+func (m *MemcachedStore) Get(k string) ([]byte, error) {
 
-	i, err := m.client.Get(m.key(k))
+	val, err := m.client.Get(m.key(k))
 
 	if err != nil {
 		return nil, m.adaptError(err)
 	}
 
-	item, err := onecache.BytesToItem(i.Value)
+	return val.Value, nil
 
-	if err != nil {
-		return nil, err
-	}
-
-	return item.Data, nil
 }
 
 func (m *MemcachedStore) Delete(k string) error {
@@ -94,16 +81,4 @@ func (m *MemcachedStore) adaptError(err error) error {
 
 func (m *MemcachedStore) Flush() error {
 	return m.client.DeleteAll()
-}
-
-func (m *MemcachedStore) Increment(k string, steps int) error {
-	_, err := m.client.Increment(m.key(k), uint64(steps))
-
-	return m.adaptError(err)
-}
-
-func (m *MemcachedStore) Decrement(k string, steps int) error {
-	_, err := m.client.Decrement(m.key(k), uint64(steps))
-
-	return m.adaptError(err)
 }

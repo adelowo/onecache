@@ -25,6 +25,7 @@ func createDirectory(dir string) error {
 
 type FSStore struct {
 	baseDir string
+	b       onecache.Serializer
 }
 
 //Returns an initialized Filesystem Cache
@@ -40,20 +41,20 @@ func MustNewFSStore(baseDir string) *FSStore {
 		}
 	}
 
-	return &FSStore{baseDir}
+	return &FSStore{baseDir, onecache.NewCacheSerializer()}
 }
 
-func (fs *FSStore) Set(key string, data interface{}, expiresAt time.Duration) error {
+func (fs *FSStore) Set(key string, data []byte, expiresAt time.Duration) error {
 
 	path := fs.filePathFor(key)
 
-	if err := os.MkdirAll(filepath.Dir(path), defaultDirectoryFilePerm); err != nil {
+	if err := createDirectory(filepath.Dir(path)); err != nil {
 		return err
 	}
 
 	i := &onecache.Item{ExpiresAt: time.Now().Add(expiresAt), Data: data}
 
-	b, err := i.Bytes()
+	b, err := fs.b.Serialize(i)
 
 	if err != nil {
 		return err
@@ -64,7 +65,7 @@ func (fs *FSStore) Set(key string, data interface{}, expiresAt time.Duration) er
 
 //Fetches a cache key.
 //This runs garbage collection on the key if necessary
-func (fs *FSStore) Get(key string) (interface{}, error) {
+func (fs *FSStore) Get(key string) ([]byte, error) {
 
 	b, err := ioutil.ReadFile(fs.filePathFor(key))
 
@@ -72,7 +73,13 @@ func (fs *FSStore) Get(key string) (interface{}, error) {
 		return nil, err
 	}
 
-	i, err := onecache.BytesToItem(b)
+	i := new(onecache.Item)
+
+	err = fs.b.DeSerialize(b,i)
+
+	if err != nil {
+		return nil, err
+	}
 
 	if i.IsExpired() {
 		fs.Delete(key)
@@ -103,68 +110,6 @@ func (fs *FSStore) filePathFor(key string) string {
 		string(hashSumAsString[0:2]),
 		string(hashSumAsString[2:4]),
 		string(hashSumAsString[4:6]), hashSumAsString)
-}
-
-func (fs *FSStore) Increment(key string, steps int) error {
-
-	path := fs.filePathFor(key)
-
-	b, err := ioutil.ReadFile(path)
-
-	if err != nil {
-		return err
-	}
-
-	item, err := onecache.BytesToItem(b)
-
-	if err != nil {
-		return err
-	}
-
-	item.Data, err = onecache.Increment(item.Data, steps)
-
-	if err != nil {
-		return err
-	}
-
-	b, err = item.Bytes()
-
-	if err != nil {
-		return err
-	}
-
-	return writeFile(path, b)
-}
-
-func (fs *FSStore) Decrement(key string, steps int) error {
-
-	path := fs.filePathFor(key)
-
-	b, err := ioutil.ReadFile(path)
-
-	if err != nil {
-		return err
-	}
-
-	item, err := onecache.BytesToItem(b)
-
-	if err != nil {
-		return err
-	}
-
-	item.Data, err = onecache.Decrement(item.Data, steps)
-
-	if err != nil {
-		return err
-	}
-
-	b, err = item.Bytes()
-
-	if err != nil {
-		return err
-	}
-
-	return writeFile(path, b)
 }
 
 func writeFile(path string, b []byte) error {

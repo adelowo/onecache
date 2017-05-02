@@ -7,9 +7,28 @@ import (
 	"time"
 )
 
-//Converts an item into bytes
-func (i *Item) Bytes() ([]byte, error) {
+//Helper method to check if an item is expired.
+//Current usecase for this is for garbage collection
+func (i *Item) IsExpired() bool {
+	return time.Now().After(i.ExpiresAt)
+}
 
+type Serializer interface {
+	Serialize(i interface{}) ([]byte, error)
+	DeSerialize(data []byte, i interface{}) error
+}
+
+func NewCacheSerializer() *CacheSerializer {
+	return &CacheSerializer{}
+}
+
+//Helper to serialize and deserialize types
+type CacheSerializer struct {
+}
+
+//Convert a given type into a byte array
+//Caveat -> Types you create might have to be registered with the encoding/gob package
+func (b *CacheSerializer) Serialize(i interface{}) ([]byte, error) {
 	var buf bytes.Buffer
 
 	enc := gob.NewEncoder(&buf)
@@ -21,20 +40,9 @@ func (i *Item) Bytes() ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-//Helper method to check if an item is expired.
-//Current usecase for this is for garbage collection
-func (i *Item) IsExpired() bool {
-	return time.Now().After(i.ExpiresAt)
-}
-
-//Decodes bytes into an item struct
-func BytesToItem(data []byte) (*Item, error) {
-
-	i := new(Item)
-
-	err := gob.NewDecoder(bytes.NewBuffer(data)).Decode(i)
-
-	return i, err
+//Writes a byte array into a type.
+func (b *CacheSerializer) DeSerialize(data []byte, i interface{}) error {
+	return gob.NewDecoder(bytes.NewBuffer(data)).Decode(i)
 }
 
 func Increment(val interface{}, steps int) (interface{}, error) {

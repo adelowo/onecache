@@ -30,16 +30,16 @@ func NewRedisStore(opts *redis.Options, prefix string) *RedisStore {
 	return &RedisStore{redis.NewClient(opts), p}
 }
 
-func (r *RedisStore) Set(key string, data interface{}, expires time.Duration) error {
-	return r.client.Set(r.key(key), data, expires).Err()
+func (r *RedisStore) Set(k string, data []byte, expires time.Duration) error {
+	return r.client.Set(r.key(k), data, expires).Err()
 }
 
-func (r *RedisStore) Get(key string) (interface{}, error) {
+func (r *RedisStore) Get(key string) ([]byte, error) {
 
-	val, err := r.client.Get(r.key(key)).Result()
+	val, err := r.client.Get(r.key(key)).Bytes()
 
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	return val, nil
@@ -55,12 +55,4 @@ func (r *RedisStore) Flush() error {
 
 func (r *RedisStore) key(k string) string {
 	return r.prefix + k
-}
-
-func (r *RedisStore) Increment(k string, steps int) error {
-	return r.client.IncrBy(r.key(k), int64(steps)).Err()
-}
-
-func (r *RedisStore) Decrement(k string, steps int) error {
-	return r.Increment(k, steps*-1)
 }
