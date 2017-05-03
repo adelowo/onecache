@@ -133,3 +133,24 @@ func TestIncrementForUnSupportedType(t *testing.T) {
 	}
 
 }
+
+func TestSerializer_SerializeBailsOutIfTypeIsAlreadyAByteArray(t *testing.T) {
+
+	serializer := NewCacheSerializer()
+
+	byt := make([]byte, 10)
+
+	newBytes, err := serializer.Serialize(byt)
+
+	if err != nil {
+		t.Fatalf(
+			`Expected serialization to be successful... %v`,
+			err)
+	}
+
+	if !reflect.DeepEqual(byt, newBytes) {
+		t.Fatalf(
+			`Values differ \n Expected %v \n Got %v`,
+			byt, newBytes)
+	}
+}
