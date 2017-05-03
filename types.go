@@ -31,3 +31,12 @@ type Store interface {
 	Delete(key string) error
 	Flush() error
 }
+
+//Some stores like redis and memcache automatically clear out the cache
+//But for the filesystem and in memory, this cannot be said.
+//Stores that have to manually clear out the cached data should implement this method.
+//It's implementation should re run this function everytime the interval is reached
+//Say every 5 minutes.
+type GarbageCollector interface {
+	GC(interval time.Duration)
+}
