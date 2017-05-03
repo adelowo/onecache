@@ -38,12 +38,15 @@ Supported cache stores
 ```go
 
 import (
+	"time"
 	"github.com/adelowo/onecache/filesystem"
 )
 
 var fs onecache.Store
 
-fs = filesystem.MustNewFSStore("/some/writeable/directory") //Would be created if it does not exists
+fs = filesystem.MustNewFSStore("/some/writeable/directory", time.Minute * 10) //Would be created if it does not exists.
+//Expired items would be cleared out every 10 minutes
+//You might want to allow for a longer period say 30 minutes or an hour though (Your call)
 
 err := fs.Set("profile", []byte("Used to be Human"), time.Second*60)
 	 
@@ -110,10 +113,12 @@ fmt.Println(m.Flush())
 ```go
 
 import (
+	"time"
 	"github.com/adelowo/onecache/memory"
 )
 
-mem := memory.newInMemoryStore()
+mem := memory.newInMemoryStore(time.Minute * 10) 
+//Automatically clear out expired items every 10 minutes
 	
 fmt.Println(mem.Set("name", []byte("Lanre"), time.Minute*10))
 
