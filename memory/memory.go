@@ -17,8 +17,15 @@ type InMemoryStore struct {
 }
 
 //Returns a new instance of the Inmemory store
-func NewInMemoryStore() *InMemoryStore {
-	return &InMemoryStore{data: make(map[string][]byte), b: onecache.NewCacheSerializer()}
+func NewInMemoryStore(gcInterval time.Duration) *InMemoryStore {
+	i := &InMemoryStore{
+		data: make(map[string][]byte),
+		b:    onecache.NewCacheSerializer(),
+	}
+
+	i.GC(gcInterval)
+
+	return i
 }
 
 func (i *InMemoryStore) Set(key string, data []byte, expires time.Duration) error {
@@ -86,4 +93,32 @@ func (i *InMemoryStore) Flush() error {
 	i.data = make(map[string][]byte)
 
 	return nil
+}
+
+func (i *InMemoryStore) GC(gcInterval time.Duration) {
+	i.lock.Lock()
+	defer i.lock.Unlock()
+
+	if gcInterval <= (time.Second * 1) {
+		return
+	}
+
+	if len(i.data) >= 1 {
+
+		currentItem := new(onecache.Item)
+
+		for k, byt := range i.data {
+
+			err := i.b.DeSerialize(byt, currentItem)
+
+			if err == nil && currentItem.IsExpired() {
+				go i.Delete(k)
+			}
+		}
+
+	}
+
+	time.AfterFunc(gcInterval, func() {
+		i.GC(gcInterval)
+	})
 }

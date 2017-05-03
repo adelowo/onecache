@@ -17,7 +17,7 @@ var memoryStore *InMemoryStore
 
 func TestMain(t *testing.M) {
 
-	memoryStore = NewInMemoryStore()
+	memoryStore = NewInMemoryStore(time.Second * 1)
 
 	flag.Parse()
 
@@ -42,7 +42,7 @@ func (b *mockSerializer) Serialize(i interface{}) ([]byte, error) {
 	return nil, errors.New("Yup an error occurred")
 }
 
-func (b *mockSerializer) DeSerialize(data []byte, i interface{}) (error) {
+func (b *mockSerializer) DeSerialize(data []byte, i interface{}) error {
 	return errors.New("Yet another error")
 }
 
@@ -195,5 +195,43 @@ func TestInMemoryStore_Flush(t *testing.T) {
 		t.Fatalf(
 			"Store was not flushed..\n Expected %d.. Got %d ",
 			expectedNumberOfItems, x)
+	}
+}
+
+func TestInMemoryStore_GC(t *testing.T) {
+
+	//Set garbage collection interval to every 5 second
+	store := NewInMemoryStore(time.Second * 3)
+
+	tableTests := []struct {
+		key, value string
+		expires    time.Duration
+	}{
+		{"name", "Onecache", time.Microsecond},
+		{"number", "Fourty two", time.Microsecond},
+		{"x", "yz", time.Microsecond},
+	}
+
+	for _, v := range tableTests {
+		store.Set(v.key, []byte(v.value), v.expires)
+	}
+
+	//Flaky tests but I really can't bring myself to get
+	//a new dep because of this.
+	//
+	//We don't call GET here since GET would internally invalidate
+	//expired items
+	//Instead we move 2 sec forward to inspect
+	//the result of Garbage collection
+	time.Sleep(time.Second * 6)
+
+	//GC should wipe everything off since they are well past
+	//their expiration time
+	expectedNumberOfItemsInStore := 0
+
+	if x := len(store.data); x != expectedNumberOfItemsInStore {
+		t.Fatalf(
+			`Expected %d items in the store. %d found`,
+			expectedNumberOfItemsInStore, x)
 	}
 }

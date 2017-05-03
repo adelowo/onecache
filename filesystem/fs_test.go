@@ -14,13 +14,13 @@ import (
 	"github.com/adelowo/onecache"
 )
 
-var _ onecache.Store = MustNewFSStore("./")
+var _ onecache.Store = MustNewFSStore("./", time.Second)
 
 var fileCache *FSStore
 
 func TestMain(m *testing.M) {
 
-	fileCache = MustNewFSStore("./../cache")
+	fileCache = MustNewFSStore("./../cache", time.Second*1)
 
 	flag.Parse()
 	os.Exit(m.Run())
@@ -32,7 +32,7 @@ func TestMustNewFSStore(t *testing.T) {
 		recover()
 	}()
 
-	_ = MustNewFSStore("/hh")
+	_ = MustNewFSStore("/hh", time.Second)
 }
 
 var sampleData = []byte("Lanre")
@@ -119,7 +119,7 @@ func (b *mockSerializer) Serialize(i interface{}) ([]byte, error) {
 	return nil, errors.New("Yup an error occurred")
 }
 
-func (b *mockSerializer) DeSerialize(data []byte, i interface{}) (error) {
+func (b *mockSerializer) DeSerialize(data []byte, i interface{}) error {
 	return errors.New("Yet another error")
 }
 
@@ -164,5 +164,39 @@ func TestFSStore_SetFailsWhenMakingUseOfAnUnwriteableDirectory(t *testing.T) {
 	if err := fileCache.Set("test", []byte("test"), time.Microsecond*4); err == nil {
 		t.Fatal(
 			`An error was supposed to occur because the root directory isn't writeable`)
+	}
+}
+
+func TestFSStore_GC(t *testing.T) {
+	//Set garbage collection interval to every 5 second
+
+	store := MustNewFSStore("./../cache", time.Second*1)
+
+	tableTests := []struct {
+		key, value string
+		expires    time.Duration
+	}{
+		{"name", "Onecache", time.Microsecond},
+		{"number", "Fourty two", time.Microsecond},
+		{"x", "yz", time.Microsecond},
+	}
+
+	for _, v := range tableTests {
+		store.Set(v.key, []byte(v.value), v.expires)
+	}
+
+	time.Sleep(time.Second * 2)
+
+	var filePath string
+
+	for _, v := range tableTests {
+
+		filePath = store.filePathFor(v.key)
+
+		if _, err := os.Stat(filePath); err == nil {
+			t.Fatal(
+				`File exists when it isn't supposed to since there was
+				a garbage collection`)
+		}
 	}
 }
