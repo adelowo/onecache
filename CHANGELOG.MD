@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.1.0 (2017-05-05)
+
+- Added Garbage collection (in the background) for the filesystem and memory cache
+- Added a new interface `GarbageCollector`. This should be implemented only by cache stores without automatic garbage collection.
+
 ## 2.0.1 (2017-05-02)
 
 - Serializer would now refuse to encode/decode values that are already of `[]byte`. For decoding, it must be a pointer to the byte array.
