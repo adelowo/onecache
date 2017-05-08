@@ -235,3 +235,18 @@ func TestInMemoryStore_GC(t *testing.T) {
 			expectedNumberOfItemsInStore, x)
 	}
 }
+
+func TestInMemoryStore_Has(t *testing.T) {
+
+	store := NewInMemoryStore(time.Second * 10)
+
+	if ok := store.Has("name"); ok {
+		t.Fatalf("Key %s does not exist", "name")
+	}
+
+	store.Set("name", []byte("Lanre"), time.Second*2)
+
+	if ok := store.Has("name"); !ok {
+		t.Fatalf("Key %s was set and is supposed to exist", "name")
+	}
+}

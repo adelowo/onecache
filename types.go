@@ -30,6 +30,7 @@ type Store interface {
 	Get(key string) ([]byte, error)
 	Delete(key string) error
 	Flush() error
+	Has(key string) bool
 }
 
 //Some stores like redis and memcache automatically clear out the cache
