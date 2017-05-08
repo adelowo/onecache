@@ -200,3 +200,18 @@ func TestFSStore_GC(t *testing.T) {
 		}
 	}
 }
+
+func TestFSStore_Has(t *testing.T) {
+	store := MustNewFSStore("./../cache", time.Second*70)
+
+	if ok := store.Has("name"); ok {
+		t.Fatalf("Key %s is not supposed to exist in the cache", "name")
+	}
+
+	store.Set("name", []byte("Lanre"), time.Hour*10)
+
+	if ok := store.Has("name"); !ok {
+		t.Fatalf(`Expected store to have an item with key %s
+			since that key was persisted secs ago`, "name")
+	}
+}
