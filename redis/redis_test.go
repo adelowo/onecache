@@ -139,3 +139,21 @@ func TestNewRedisStore_DefaultPrefixIsUsedIfNoneIsProvided(t *testing.T) {
 	}
 
 }
+
+func TestRedisStore_Has(t *testing.T) {
+	s := NewRedisStore(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "", // no password set
+		DB:       0,  // use default DB
+	}, "")
+
+	if ok := s.Has("name"); ok {
+		t.Fatalf("Key %s is not supposed to exist in the cache", "name")
+	}
+
+	s.Set("name", []byte("Lanre"), time.Second*19)
+
+	if ok := s.Has("name"); !ok {
+		t.Fatalf("Key %s is supposed to exist in the cache", "name")
+	}
+}

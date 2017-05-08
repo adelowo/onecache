@@ -53,6 +53,15 @@ func (r *RedisStore) Flush() error {
 	return r.client.FlushDb().Err()
 }
 
+func (r *RedisStore) Has(key string) bool {
+
+	if _, err := r.Get(key); err != nil {
+		return false
+	}
+
+	return true
+}
+
 func (r *RedisStore) key(k string) string {
 	return r.prefix + k
 }
