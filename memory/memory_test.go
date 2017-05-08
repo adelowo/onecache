@@ -13,6 +13,8 @@ import (
 
 var _ onecache.Store = &InMemoryStore{}
 
+var _ onecache.GarbageCollector = &InMemoryStore{}
+
 var memoryStore *InMemoryStore
 
 func TestMain(t *testing.M) {

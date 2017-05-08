@@ -16,6 +16,8 @@ import (
 
 var _ onecache.Store = MustNewFSStore("./", time.Second)
 
+var _ onecache.GarbageCollector = MustNewFSStore("./", time.Second)
+
 var fileCache *FSStore
 
 func TestMain(m *testing.M) {
