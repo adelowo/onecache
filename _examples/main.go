@@ -46,6 +46,7 @@ func inMemoryStore() {
 	fmt.Println(mem.Set("name", []byte("Lanre"), time.Minute*10))
 	fmt.Println(mem.Get("name"))
 	fmt.Println(mem.Set("occupation", []byte("What ?"), time.Second))
+	fmt.Println(mem.Has("occupation"))
 	fmt.Println(mem.Flush())
 	fmt.Println(mem.Set("n", []byte("42"), time.Minute*1))
 	fmt.Println(mem.Get("n"))
