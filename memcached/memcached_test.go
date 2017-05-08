@@ -45,7 +45,7 @@ func TestMemcachedStore_Get(t *testing.T) {
 	if err != nil {
 		t.Fatalf(
 			`Could not get item with key %s when it in fact
-			exists... \n%v`,"name", err)
+			exists... \n%v`, "name", err)
 	}
 
 	if !reflect.DeepEqual(val, sampleData) {
@@ -106,4 +106,22 @@ func TestMemcachedStore_DefaultPrefixIsUsedWhenNoneIsSpecified(t *testing.T) {
 			\n Expected %s \n.. Got %s`,
 			PREFIX, memcachedStore.prefix)
 	}
+}
+
+func TestMemcachedStore_Has(t *testing.T) {
+	memcachedStore = NewMemcachedStore(memcache.New("127.0.0.1:11211"),
+		"",
+	)
+
+	if ok := memcachedStore.Has("name"); ok {
+		t.Fatalf("Key %s is not supposed to exist in the cache", "name")
+	}
+
+	memcachedStore.Set("name", []byte("Lanre"), time.Minute*10)
+
+	if ok := memcachedStore.Has("name"); !ok {
+		t.Fatalf(`Key %s is supposed to exist in the cache
+			as it was recently added`, "name")
+	}
+
 }
