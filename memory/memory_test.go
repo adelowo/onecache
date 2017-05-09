@@ -1,7 +1,7 @@
 package memory
 
 import (
-	"errors"
+	"bytes"
 	"flag"
 	"os"
 	"reflect"
@@ -37,28 +37,37 @@ func TestInMemoryStore_Set(t *testing.T) {
 	}
 }
 
-type mockSerializer struct {
-}
+func TestInMemoryStore_StoresCopy(t *testing.T) {
+	data := []byte("abcdef")
+	err := memoryStore.Set("key", data, time.Minute*1)
+	if err != nil {
+		t.Fatalf("Data could not be stored in the inmemory store.. \n%v", err)
+	}
 
-func (b *mockSerializer) Serialize(i interface{}) ([]byte, error) {
-	return nil, errors.New("Yup an error occurred")
-}
+	// modify the set input
+	data[0] = 'z'
+	data[1] = 'z'
 
-func (b *mockSerializer) DeSerialize(data []byte, i interface{}) error {
-	return errors.New("Yet another error")
-}
+	val, err := memoryStore.Get("key")
+	if err != nil {
+		t.Fatalf("Key %s should exist in the store... \n %v", "name", err)
+	}
 
-func TestInMemoryStore_SetErrorOccursWhenMarshallingItemToByte(t *testing.T) {
+	if !bytes.Equal(val, []byte("abcdef")) {
+		t.Fatalf("Data was not as expected: %v", val)
+	}
 
-	m := &InMemoryStore{data: make(map[string][]byte, 100), b: &mockSerializer{}}
+	// modify the get output
+	val[0] = 'z'
+	val[1] = 'z'
 
-	err := m.Set("n", []byte("ERROR"), time.Second*2)
+	val, err = memoryStore.Get("key")
+	if err != nil {
+		t.Fatalf("Key %s should exist in the store... \n %v", "name", err)
+	}
 
-	if err == nil {
-		t.Fatalf(
-			`Error should be nil as the item could not be marshalled into
-			bytes.. Got %v`,
-			err)
+	if !bytes.Equal(val, []byte("abcdef")) {
+		t.Fatalf("Data was not as expected: %v", val)
 	}
 }
 
@@ -76,32 +85,6 @@ func TestInMemoryStore_Get(t *testing.T) {
 			\n.Expected %v \n.. Got %v instead`,
 			sampleData,
 			val)
-	}
-}
-
-func TestInMemoryStore_Get_ErrorOccurrsWhileUnmarshallingToBytes(t *testing.T) {
-
-	//Since the mock marshaller fails everything,
-	//we create an inmemory map contianing sample data Get can read from
-
-	type d map[string][]byte
-
-	f := make(d, 100)
-
-	f["name"] = []byte("Onecache")
-
-	m := &InMemoryStore{data: f, b: &mockSerializer{}}
-
-	val, err := m.Get("name")
-
-	if err == nil {
-		t.Fatalf(
-			`An error is supposed to occur if bytes marshalling fails.. Got %v`,
-			err)
-	}
-
-	if val != nil {
-		t.Fatalf("Value is supposed to be nil.. Got %v instead", val)
 	}
 }
 

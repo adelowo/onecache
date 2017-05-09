@@ -11,20 +11,17 @@ import (
 
 //Represents an inmemory store
 type InMemoryStore struct {
-	b    onecache.Serializer
 	lock sync.RWMutex
-	data map[string][]byte
+	data map[string]*onecache.Item
 }
 
 //Returns a new instance of the Inmemory store
 func NewInMemoryStore(gcInterval time.Duration) *InMemoryStore {
 	i := &InMemoryStore{
-		data: make(map[string][]byte),
-		b:    onecache.NewCacheSerializer(),
+		data: make(map[string]*onecache.Item),
 	}
 
 	i.GC(gcInterval)
-
 	return i
 }
 
@@ -32,15 +29,10 @@ func (i *InMemoryStore) Set(key string, data []byte, expires time.Duration) erro
 	i.lock.Lock()
 	defer i.lock.Unlock()
 
-	item := &onecache.Item{ExpiresAt: time.Now().Add(expires), Data: data}
-
-	b, err := i.b.Serialize(item)
-
-	if err != nil {
-		return err
+	i.data[key] = &onecache.Item{
+		ExpiresAt: time.Now().Add(expires),
+		Data:      copyData(data),
 	}
-
-	i.data[key] = b
 
 	return nil
 }
@@ -49,18 +41,9 @@ func (i *InMemoryStore) Get(key string) ([]byte, error) {
 	i.lock.RLock()
 	defer i.lock.RUnlock()
 
-	bytes, ok := i.data[key]
-
-	if !ok {
+	item := i.data[key]
+	if item == nil {
 		return nil, onecache.ErrCacheMiss
-	}
-
-	item := new(onecache.Item)
-
-	err := i.b.DeSerialize(bytes, item)
-
-	if err != nil {
-		return nil, err
 	}
 
 	if item.IsExpired() {
@@ -68,7 +51,7 @@ func (i *InMemoryStore) Get(key string) ([]byte, error) {
 		return nil, onecache.ErrCacheMiss
 	}
 
-	return item.Data, nil
+	return copyData(item.Data), nil
 }
 
 func (i *InMemoryStore) Delete(key string) error {
@@ -76,13 +59,11 @@ func (i *InMemoryStore) Delete(key string) error {
 	defer i.lock.Unlock()
 
 	_, ok := i.data[key]
-
 	if !ok {
 		return onecache.ErrCacheMiss
 	}
 
 	delete(i.data, key)
-
 	return nil
 }
 
@@ -90,8 +71,7 @@ func (i *InMemoryStore) Flush() error {
 	i.lock.Lock()
 	defer i.lock.Unlock()
 
-	i.data = make(map[string][]byte)
-
+	i.data = make(map[string]*onecache.Item)
 	return nil
 }
 
@@ -99,11 +79,8 @@ func (i *InMemoryStore) Has(key string) bool {
 	i.lock.Lock()
 	defer i.lock.Unlock()
 
-	if _, ok := i.data[key]; ok {
-		return true
-	}
-
-	return false
+	_, ok := i.data[key]
+	return ok
 }
 
 func (i *InMemoryStore) GC(gcInterval time.Duration) {
@@ -114,22 +91,20 @@ func (i *InMemoryStore) GC(gcInterval time.Duration) {
 		return
 	}
 
-	if len(i.data) >= 1 {
-
-		currentItem := new(onecache.Item)
-
-		for k, byt := range i.data {
-
-			err := i.b.DeSerialize(byt, currentItem)
-
-			if err == nil && currentItem.IsExpired() {
-				go i.Delete(k)
-			}
+	for k, item := range i.data {
+		if item.IsExpired() {
+			go i.Delete(k)
 		}
-
 	}
 
 	time.AfterFunc(gcInterval, func() {
 		i.GC(gcInterval)
 	})
+}
+
+func copyData(data []byte) []byte {
+	result := make([]byte, len(data))
+	copy(result, data)
+
+	return result
 }
