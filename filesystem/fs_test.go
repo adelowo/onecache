@@ -16,6 +16,8 @@ import (
 
 var _ onecache.Store = MustNewFSStore("./", time.Second)
 
+var _ onecache.GarbageCollector = MustNewFSStore("./", time.Second)
+
 var fileCache *FSStore
 
 func TestMain(m *testing.M) {
@@ -198,5 +200,20 @@ func TestFSStore_GC(t *testing.T) {
 				`File exists when it isn't supposed to since there was
 				a garbage collection`)
 		}
+	}
+}
+
+func TestFSStore_Has(t *testing.T) {
+	store := MustNewFSStore("./../cache", time.Second*70)
+
+	if ok := store.Has("name"); ok {
+		t.Fatalf("Key %s is not supposed to exist in the cache", "name")
+	}
+
+	store.Set("name", []byte("Lanre"), time.Hour*10)
+
+	if ok := store.Has("name"); !ok {
+		t.Fatalf(`Expected store to have an item with key %s
+			since that key was persisted secs ago`, "name")
 	}
 }

@@ -143,6 +143,15 @@ func (fs *FSStore) GC(gcInterval time.Duration) {
 	})
 }
 
+func (fs *FSStore) Has(key string) bool {
+
+	if _, err := os.Open(fs.filePathFor(key)); err != nil {
+		return false
+	}
+
+	return true
+}
+
 //Gets a unique path for a cache key.
 //This is going to be a directory 3 level deep. Something like "basedir/33/rr/33/hash"
 func (fs *FSStore) filePathFor(key string) string {

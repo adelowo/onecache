@@ -95,6 +95,17 @@ func (i *InMemoryStore) Flush() error {
 	return nil
 }
 
+func (i *InMemoryStore) Has(key string) bool {
+	i.lock.Lock()
+	defer i.lock.Unlock()
+
+	if _, ok := i.data[key]; ok {
+		return true
+	}
+
+	return false
+}
+
 func (i *InMemoryStore) GC(gcInterval time.Duration) {
 	i.lock.Lock()
 	defer i.lock.Unlock()

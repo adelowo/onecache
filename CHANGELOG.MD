@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.0 (2017-05-09)
+
+- Added `Has` as an operation on all cache stores. It checks if an item exists in the cache before trying to fetch it.
+
 ## 2.1.0 (2017-05-05)
 
 - Added Garbage collection (in the background) for the filesystem and memory cache
@@ -19,9 +23,8 @@
 
 - Initial release
 - Stores
- 
+
   - Inmemory
   - Redis
   - Memcached
   - Filesystem
-

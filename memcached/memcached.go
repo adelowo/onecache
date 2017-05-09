@@ -82,3 +82,12 @@ func (m *MemcachedStore) adaptError(err error) error {
 func (m *MemcachedStore) Flush() error {
 	return m.client.DeleteAll()
 }
+
+func (m *MemcachedStore) Has(key string) bool {
+
+	if _, err := m.Get(key); err != nil {
+		return false
+	}
+
+	return true
+}

@@ -17,8 +17,6 @@ $ go get -u github.com/adelowo/onecache
 
 ```
 
-> Version 2 was recently released and it fixed a number of issues as per how data was cached (the main bone of contention being the use of `interface{}`. Take a look at this [issue](https://github.com/adelowo/onecache/issues/7)). Version 1 would still be maintained going forward ([branch here](https://github.com/adelowo/onecache/tree/1.x)) but newer development would be based on v2.
-
 <div id="stores"></div>
 
 Supported cache stores
@@ -49,10 +47,12 @@ fs = filesystem.MustNewFSStore("/some/writeable/directory", time.Minute * 10) //
 //You might want to allow for a longer period say 30 minutes or an hour though (Your call)
 
 err := fs.Set("profile", []byte("Used to be Human"), time.Second*60)
-	 
+
 fmt.Println(err)
-	 
+
 fmt.Println(fs.Get("profile"))
+
+fmt.Println(fs.Has("profile"))
 
 fmt.Println(fs.Flush()) //Clear out all cached data
 
@@ -60,7 +60,7 @@ fmt.Println(fs.Flush()) //Clear out all cached data
 
 > You are not limited to storing primitives ...Please check out the [examples](https://github.com/adelowo/onecache/blob/master/_examples/main.go)
 
-- Redis 
+- Redis
 
 ```go
 
@@ -117,9 +117,9 @@ import (
 	"github.com/adelowo/onecache/memory"
 )
 
-mem := memory.newInMemoryStore(time.Minute * 10) 
+mem := memory.newInMemoryStore(time.Minute * 10)
 //Automatically clear out expired items every 10 minutes
-	
+
 fmt.Println(mem.Set("name", []byte("Lanre"), time.Minute*10))
 
 fmt.Println(mem.Get("name"))

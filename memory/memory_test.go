@@ -13,6 +13,8 @@ import (
 
 var _ onecache.Store = &InMemoryStore{}
 
+var _ onecache.GarbageCollector = &InMemoryStore{}
+
 var memoryStore *InMemoryStore
 
 func TestMain(t *testing.M) {
@@ -233,5 +235,20 @@ func TestInMemoryStore_GC(t *testing.T) {
 		t.Fatalf(
 			`Expected %d items in the store. %d found`,
 			expectedNumberOfItemsInStore, x)
+	}
+}
+
+func TestInMemoryStore_Has(t *testing.T) {
+
+	store := NewInMemoryStore(time.Second * 10)
+
+	if ok := store.Has("name"); ok {
+		t.Fatalf("Key %s does not exist", "name")
+	}
+
+	store.Set("name", []byte("Lanre"), time.Second*2)
+
+	if ok := store.Has("name"); !ok {
+		t.Fatalf("Key %s was set and is supposed to exist", "name")
 	}
 }
