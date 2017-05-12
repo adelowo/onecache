@@ -176,7 +176,7 @@ func TestInMemoryStore_Flush(t *testing.T) {
 		t.Fatalf("An error occurred while the store was being flushed... %v", err)
 	}
 
-	if x := len(memoryStore.data); x != expectedNumberOfItems {
+	if x := memoryStore.count(); x != expectedNumberOfItems {
 		t.Fatalf(
 			"Store was not flushed..\n Expected %d.. Got %d ",
 			expectedNumberOfItems, x)
@@ -214,7 +214,7 @@ func TestInMemoryStore_GC(t *testing.T) {
 	//their expiration time
 	expectedNumberOfItemsInStore := 0
 
-	if x := len(store.data); x != expectedNumberOfItemsInStore {
+	if x := store.count(); x != expectedNumberOfItemsInStore {
 		t.Fatalf(
 			`Expected %d items in the store. %d found`,
 			expectedNumberOfItemsInStore, x)

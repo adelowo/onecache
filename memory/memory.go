@@ -93,13 +93,22 @@ func (i *InMemoryStore) GC(gcInterval time.Duration) {
 
 	for k, item := range i.data {
 		if item.IsExpired() {
-			go i.Delete(k)
+			//No need to spawn a new goroutine since we
+			//still have the lock here
+			delete(i.data, k)
 		}
 	}
 
 	time.AfterFunc(gcInterval, func() {
 		i.GC(gcInterval)
 	})
+}
+
+func (i *InMemoryStore) count() int {
+	i.lock.Lock()
+	defer i.lock.Unlock()
+
+	return len(i.data)
 }
 
 func copyData(data []byte) []byte {

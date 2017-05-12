@@ -160,15 +160,6 @@ func TestFSStore_Delete(t *testing.T) {
 	}
 }
 
-func TestFSStore_SetFailsWhenMakingUseOfAnUnwriteableDirectory(t *testing.T) {
-	fileCache.baseDir = "/" //change directory to the OS root
-
-	if err := fileCache.Set("test", []byte("test"), time.Microsecond*4); err == nil {
-		t.Fatal(
-			`An error was supposed to occur because the root directory isn't writeable`)
-	}
-}
-
 func TestFSStore_GC(t *testing.T) {
 	//Set garbage collection interval to every 5 second
 
