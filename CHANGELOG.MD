@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.2.1 (2017-05-12)
+
+- [Bugfix] Fixed race condition in the tests for the Memory and Filesystem store.
+
+- [Improvement] Memory store now stores `*onecache.Item` rather than converting to `[]byte`.
+
+
 ## 2.2.0 (2017-05-09)
 
 - Added `Has` as an operation on all cache stores. It checks if an item exists in the cache before trying to fetch it.
