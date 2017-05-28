@@ -56,6 +56,7 @@ func (b *CacheSerializer) DeSerialize(data []byte, i interface{}) error {
 	return gob.NewDecoder(bytes.NewBuffer(data)).Decode(i)
 }
 
+//Increment increases the value of an item by the specified number of steps
 func Increment(val interface{}, steps int) (interface{}, error) {
 
 	var ret interface{}
@@ -106,6 +107,7 @@ func Increment(val interface{}, steps int) (interface{}, error) {
 
 }
 
+//Decrement decreases the value of an item by the specified number of steps
 func Decrement(val interface{}, steps int) (interface{}, error) {
 	return Increment(val, steps*-1)
 }

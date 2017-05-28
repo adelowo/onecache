@@ -18,7 +18,7 @@ var (
 		Data isn't an integer/string type. Hence, it cannot be increased or decreased`)
 )
 
-//identifes a cached piece of data
+//Item identifes a cached piece of data
 type Item struct {
 	ExpiresAt time.Time
 	Data      []byte
