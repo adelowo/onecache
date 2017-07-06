@@ -6,6 +6,7 @@
 - [Installation](#install)
 - [Supported stores](#stores)
 - [Examples](#eg)
+  - [3rd party stores](#extra)
 
 <div id="install"></div>
 
@@ -128,6 +129,27 @@ fmt.Println(mem.Get("unknown"))
 fmt.Println(mem.Set("hobby", []byte("Trolling"), time.Second))
 
 fmt.Println(mem.Flush())
+
+```
+
+<div id="extra"></div>
+
+```go
+import (
+      
+          "github.com/adelowo/onecache/memory"
+)
+
+//This is lazy loaded..The function only  gets executed when you request for the boltdb store
+onecache.Extend("boltdb", func() onecache.Store {
+	return &Bolt{}
+})
+
+
+//Somewhere else
+
+boltStore, err := onecache.Get("boltdb")
+
 
 ```
 

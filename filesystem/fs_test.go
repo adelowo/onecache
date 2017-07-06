@@ -208,3 +208,12 @@ func TestFSStore_Has(t *testing.T) {
 			since that key was persisted secs ago`, "name")
 	}
 }
+
+func TestExtensibility(t *testing.T) {
+
+	_, err := onecache.Get("fs")
+
+	if err != nil {
+		t.Fatalf("An error occurred.. %v", err)
+	}
+}

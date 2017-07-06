@@ -157,3 +157,12 @@ func TestRedisStore_Has(t *testing.T) {
 		t.Fatalf("Key %s is supposed to exist in the cache", "name")
 	}
 }
+
+func TestExtensibility(t *testing.T) {
+
+	_, err := onecache.Get("redis")
+
+	if err != nil {
+		t.Fatalf("An error occurred %v", err)
+	}
+}
