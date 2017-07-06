@@ -22,10 +22,12 @@ $ go get -u github.com/adelowo/onecache
 
 Supported cache stores
 
-- [x] InMemory
-- [x] Filesystem
-- [x] Memcached
-- [x] Redis
+- [x] InMemory - "memory"
+- [x] Filesystem - "fs"
+- [x] Memcached - "memcached"
+- [x] Redis  - "redis"
+
+> You can make use of `onecache.Get("memcached")` to access the memcached adapter.. Refer to the list above for other adapters' aliases. Alternatively scroll below for more advanced usage
 
 
 <div id="eg"></div>
