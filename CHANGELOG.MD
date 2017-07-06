@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.3.0 (2017-06-07)
+
+- [Enhancement] Custom third party cache adapters can now be registered with `Extend`..
+
 ## 2.2.1 (2017-05-12)
 
 - [Bugfix] Fixed race condition in the tests for the Memory and Filesystem store.
