@@ -18,6 +18,22 @@ const (
 	defaultDirectoryFilePerm             = 0755
 )
 
+func init() {
+
+	onecache.Extend("fs", func() onecache.Store {
+		baseDir := "./../storage/cache"
+		_, err := os.Stat(baseDir)
+
+		if err != nil {
+			if err := createDirectory(baseDir); err != nil {
+				panic(fmt.Errorf("Base directory could not be created : %s", err))
+			}
+		}
+
+		return &FSStore{baseDir, onecache.NewCacheSerializer()}
+	})
+}
+
 func createDirectory(dir string) error {
 
 	return os.MkdirAll(dir, defaultDirectoryFilePerm)

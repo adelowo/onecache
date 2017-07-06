@@ -4,6 +4,7 @@ package redis
 import (
 	"time"
 
+	"github.com/adelowo/onecache"
 	"github.com/go-redis/redis"
 )
 
@@ -13,6 +14,18 @@ const PREFIX = "onecache:"
 type RedisStore struct {
 	client *redis.Client
 	prefix string
+}
+
+func init() {
+	onecache.Extend("redis", func() onecache.Store {
+		//Default for most usage..
+		//Can make use of NewRedisStore() for custom settings
+		return NewRedisStore(&redis.Options{
+			Addr:     "localhost:6379",
+			Password: "",
+			DB:       0,
+		}, "")
+	})
 }
 
 //Returns a new instance of the RedisStore
