@@ -132,10 +132,10 @@ func TestNewRedisStore_DefaultPrefixIsUsedIfNoneIsProvided(t *testing.T) {
 		DB:       0,  // use default DB
 	}, "")
 
-	if !reflect.DeepEqual(PREFIX, s.prefix) {
+	if !reflect.DeepEqual(defaultPrefix, s.prefix) {
 		t.Fatalf(`
 		Redis store prefix is invalid..
-		Expected %s \n... Got %s`, PREFIX, s.prefix)
+		Expected %s \n... Got %s`, defaultPrefix, s.prefix)
 	}
 
 }

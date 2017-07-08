@@ -9,7 +9,7 @@ import (
 )
 
 //Default prefix to prevent collision with other key stored in redis
-const PREFIX = "onecache:"
+const defaultPrefix = "onecache:"
 
 type RedisStore struct {
 	client *redis.Client
@@ -35,7 +35,7 @@ func NewRedisStore(opts *redis.Options, prefix string) *RedisStore {
 	var p string
 
 	if prefix == "" {
-		p = PREFIX
+		p = defaultPrefix
 	} else {
 		p = prefix
 	}
