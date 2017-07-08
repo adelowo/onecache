@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.3.1 (2017-07-08)
+
+- Set up a default prefix when registering the redis adapter.
+
 ## 2.3.0 (2017-07-06)
 
 - [Enhancement] Custom third party cache adapters can now be registered with `Extend`..
