@@ -24,7 +24,7 @@ func init() {
 			Addr:     "localhost:6379",
 			Password: "",
 			DB:       0,
-		}, "")
+		}, defaultPrefix)
 	})
 }
 
