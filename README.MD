@@ -27,131 +27,42 @@ Supported cache stores
 - [x] Memcached - "memcached"
 - [x] Redis  - "redis"
 
-> You can make use of `onecache.Get("memcached")` to access the memcached adapter.. Refer to the list above for other adapters' aliases. Alternatively scroll below for more advanced usage
+> You can make use of `onecache.Get("memcached")` to access the memcached adapter.. Refer to the list above for other adapters' aliases. 
 
 
 <div id="eg"></div>
 
-> Have a look at the [interface](https://github.com/adelowo/onecache/blob/master/types.go#L27-L35) for all stores to get an idea of all available methods
-
-- Filesystem
-
 ```go
 
-import (
-	"time"
-	"github.com/adelowo/onecache/filesystem"
-)
+store, err := onecache.Get("fs") //filesystem store
 
-var fs onecache.Store
-
-fs = filesystem.MustNewFSStore("/some/writeable/directory", time.Minute * 10) //Would be created if it does not exists.
-//Expired items would be cleared out every 10 minutes
-//You might want to allow for a longer period say 30 minutes or an hour though (Your call)
-
-err := fs.Set("profile", []byte("Used to be Human"), time.Second*60)
-
-fmt.Println(err)
-
-fmt.Println(fs.Get("profile"))
-
-fmt.Println(fs.Has("profile"))
-
-fmt.Println(fs.Flush()) //Clear out all cached data
-
-```
-
-> You are not limited to storing primitives ...Please check out the [examples](https://github.com/adelowo/onecache/blob/master/_examples/main.go)
-
-- Redis
-
-```go
-
-import (
-	"github.com/adelowo/onecache/redis"
-	r "github.com/go-redis/redis"
-)
-
-opt := &r.Options{
-	Addr:     "localhost:6379",
-	Password: "", // no password set
-	DB:       0,  // use default DB
+if err != nil {
+	return err
 }
 
-redisStore := redis.NewRedisStore(opt, "")
+_ := store.Set("number", []byte("42"), time.Hour * 10)
 
-fmt.Println(redisStore.Set("profile", []byte("Github\n"), time.Minute*10))
-
-val, err := redisStore.Get("profile")
-
-fmt.Println(val, err)
-
-fmt.Println(redisStore.Flush())
-
+return store.Get("number")
 
 ```
 
-- Memcached
-
-```go
-
-import(
-	"github.com/bradfitz/gomemcache/memcache"
-	"github.com/adelowo/onecache/memcached"
-)
-
-m := memcached.NewMemcachedStore(memcache.New("127.0.0.1:11211"),"",)
-
-fmt.Println(m.Set("name", []byte("Lanre"), onecache.EXPIRES_DEFAULT))
-
-fmt.Println(m.Get("name"))
-
-fmt.Println(m.Flush())
-
-
-```
-
-- InMemory
-
-```go
-
-import (
-	"time"
-	"github.com/adelowo/onecache/memory"
-)
-
-mem := memory.newInMemoryStore(time.Minute * 10)
-//Automatically clear out expired items every 10 minutes
-
-fmt.Println(mem.Set("name", []byte("Lanre"), time.Minute*10))
-
-fmt.Println(mem.Get("name"))
-fmt.Println(mem.Get("unknown"))
-
-fmt.Println(mem.Set("hobby", []byte("Trolling"), time.Second))
-
-fmt.Println(mem.Flush())
-
-```
+Take a look at the [_examples](https://github.com/adelowo/onecache/blob/master/types.go#L27-L35) for all stores to get an idea of all available methods
 
 <div id="extra"></div>
 
 ```go
 import (
-      
-          "github.com/adelowo/onecache/memory"
+          "github.com/adelowo/onecache"
 )
 
 //This is lazy loaded..The function only  gets executed when you request for the boltdb store
 onecache.Extend("boltdb", func() onecache.Store {
-	return &Bolt{}
+	cfg, _ := config.New("path.json")
+	return &Bolt{cfg.DBPath}
 })
 
-
 //Somewhere else
-
 boltStore, err := onecache.Get("boltdb")
-
 
 ```
 
