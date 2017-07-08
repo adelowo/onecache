@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.3.0 (2017-06-07)
+## 2.3.0 (2017-07-06)
 
 - [Enhancement] Custom third party cache adapters can now be registered with `Extend`..
 
