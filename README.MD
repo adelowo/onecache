@@ -32,6 +32,8 @@ Supported cache stores
 
 <div id="eg"></div>
 
+[Examples containing all adapters can be found here][eg]
+
 ```go
 
 store, err := onecache.Get("fs") //filesystem store
@@ -46,7 +48,11 @@ return store.Get("number")
 
 ```
 
-Take a look at the [_examples](https://github.com/adelowo/onecache/blob/master/types.go#L27-L35) for all stores to get an idea of all available methods
+A couple things to keep in mind while making use of `onecache.Get("adapter_alias") :
+
+- Redis : THe connection used is `localhost:6379` with the default database and an empty password.. While this would suffce for most usage, if you have custom connection requirements (like a password protected redis database, refer to the [examples][eg] too see how to make use of custom connection parameters.
+
+- Memcached - The Memcached server connected to is located at the address `127.0.0.1:11211` which is usually the default. If you have custom requirements, please refer to the [examples][eg] to see how to make use of custom connection parameters.
 
 <div id="extra"></div>
 
@@ -68,3 +74,5 @@ boltStore, err := onecache.Get("boltdb")
 
 ### LICENSE
 MIT
+
+[eg]: https://github.com/adelowo/onecache/blob/master/_examples/main.go
