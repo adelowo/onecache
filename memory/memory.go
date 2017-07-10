@@ -11,11 +11,9 @@ import (
 
 func init() {
 	onecache.Extend("memory", func() onecache.Store {
-		i := &InMemoryStore{
+		return &InMemoryStore{
 			data: make(map[string]*onecache.Item),
 		}
-
-		return i
 	})
 }
 
