@@ -27,6 +27,8 @@ Supported cache stores
 - [x] Memcached - "memcached"
 - [x] Redis  - "redis"
 
+OneCache also comes with ___garbage collection___. This is used by the filesystem and memory adapter to purge out expired items automatically. Please refer to the [examples][eg]
+
 > You can make use of `onecache.Get("memcached")` to access the memcached adapter.. Refer to the list above for other adapters' aliases. 
 
 
@@ -49,6 +51,17 @@ return store.Get("number")
 ```
 
 A couple things to keep in mind while making use of `onecache.Get("adapter_alias") :
+
+- For the filesystem and memory adapters, ___garbage collection___ isn't run automatically, you would have to manually do this by calling `GC()`.
+
+```go
+
+fs, _ := onecache.Get("fs")
+
+go fs.GC()
+
+//Or make use of the constructors provided by the adapters (auto GC) -- NewXXX()
+```
 
 - Redis : THe connection used is `localhost:6379` with the default database and an empty password.. While this would suffce for most usage, if you have custom connection requirements (like a password protected redis database, refer to the [examples][eg] too see how to make use of custom connection parameters.
 
