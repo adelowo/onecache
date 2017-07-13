@@ -58,7 +58,7 @@ A couple things to keep in mind while making use of `onecache.Get("adapter_alias
 
 fs, _ := onecache.Get("fs")
 
-go fs.GC()
+go fs.GC(time.Minute * 10) //Check for and delete expired items every 10 minutes
 
 //Or make use of the constructors provided by the adapters (auto GC) -- NewXXX()
 ```
