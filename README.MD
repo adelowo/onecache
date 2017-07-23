@@ -38,6 +38,23 @@ OneCache also comes with ___garbage collection___. This is used by the filesyste
 
 ```go
 
+
+var store onecache.Store
+
+store = filesystem.MustNewFSStore("/home/adez/onecache_tmp", time.Minute*10)
+
+err := store.Set("profile", []byte("Lanre"), time.Second*60)
+
+fmt.Println(err)
+
+fmt.Println(store.Get("profile"))
+
+```
+
+You can also make use of the `Get` to fetch a store..
+
+```go
+
 store, err := onecache.Get("fs") //filesystem store
 
 if err != nil {
@@ -50,7 +67,7 @@ return store.Get("number")
 
 ```
 
-A couple things to keep in mind while making use of `onecache.Get("adapter_alias") :
+A couple things to keep in mind while making use of `onecache.Get("adapter_alias")` :
 
 - For the filesystem and memory adapters, ___garbage collection___ isn't run automatically, you would have to manually do this by calling `GC()`.
 
