@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.3.2 (2017-07-25)
+
+- Garbage collection should always run inside another goroutine.. THis is to prevent blocking.
+
 ## 2.3.1 (2017-07-08)
 
 - Set up a default prefix when registering the redis adapter.
