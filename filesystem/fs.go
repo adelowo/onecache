@@ -59,7 +59,7 @@ func MustNewFSStore(baseDir string, gcInterval time.Duration) *FSStore {
 
 	fs := &FSStore{baseDir, onecache.NewCacheSerializer()}
 
-	fs.GC(gcInterval)
+	go fs.GC(gcInterval)
 
 	return fs
 }
