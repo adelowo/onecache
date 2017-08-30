@@ -32,12 +32,13 @@ func (r *registeredAdapters) add(name string, fn AdapterFunc) {
 
 func (r *registeredAdapters) get(name string) (Store, error) {
 	r.lock.RLock()
-	defer r.lock.RUnlock()
 
 	if fn, ok := r.stores[name]; ok {
+		r.lock.RUnlock()
 		return fn(), nil
 	}
 
+	r.lock.RUnlock()
 	return nil, errors.New("Adapter not found")
 }
 
