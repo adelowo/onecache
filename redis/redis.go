@@ -63,7 +63,7 @@ func (r *RedisStore) Delete(key string) error {
 }
 
 func (r *RedisStore) Flush() error {
-	return r.client.FlushDb().Err()
+	return r.client.FlushDB().Err()
 }
 
 func (r *RedisStore) Has(key string) bool {
