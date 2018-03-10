@@ -76,6 +76,8 @@ that is needed to call is `store.GC()`. Ideally, this should be called in a `tic
 
 <div id="extra"></div>
 
+### 3rd part store
+
 ```go
 import (
           "github.com/adelowo/onecache"
