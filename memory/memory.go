@@ -25,74 +25,74 @@ type InMemoryStore struct {
 
 //Returns a new instance of the Inmemory store
 func NewInMemoryStore(gcInterval time.Duration) *InMemoryStore {
-	i := &InMemoryStore{
+	return &InMemoryStore{
 		data: make(map[string]*onecache.Item),
 	}
-
-	return i
 }
 
 func (i *InMemoryStore) Set(key string, data []byte, expires time.Duration) error {
 	i.lock.Lock()
-	defer i.lock.Unlock()
 
 	i.data[key] = &onecache.Item{
 		ExpiresAt: time.Now().Add(expires),
 		Data:      copyData(data),
 	}
 
+	i.lock.Unlock()
 	return nil
 }
 
 func (i *InMemoryStore) Get(key string) ([]byte, error) {
 	i.lock.RLock()
-	defer i.lock.RUnlock()
 
 	item := i.data[key]
 	if item == nil {
+		i.lock.RUnlock()
 		return nil, onecache.ErrCacheMiss
 	}
 
 	if item.IsExpired() {
-		go i.Delete(key) //Prevent a deadlock since the mutex is still locked here
+		i.lock.RUnlock()
+		i.Delete(key)
 		return nil, onecache.ErrCacheMiss
 	}
 
+	i.lock.RUnlock()
 	return copyData(item.Data), nil
 }
 
 func (i *InMemoryStore) Delete(key string) error {
 	i.lock.Lock()
-	defer i.lock.Unlock()
 
 	_, ok := i.data[key]
 	if !ok {
+		i.lock.Unlock()
 		return onecache.ErrCacheMiss
 	}
 
+	i.lock.Unlock()
 	delete(i.data, key)
 	return nil
 }
 
 func (i *InMemoryStore) Flush() error {
 	i.lock.Lock()
-	defer i.lock.Unlock()
 
 	i.data = make(map[string]*onecache.Item)
+	i.lock.Unlock()
 	return nil
 }
 
 func (i *InMemoryStore) Has(key string) bool {
-	i.lock.Lock()
-	defer i.lock.Unlock()
+	i.lock.RLock()
 
 	_, ok := i.data[key]
+	i.lock.RUnlock()
 	return ok
 }
 
 func (i *InMemoryStore) GC() {
 	i.lock.Lock()
-	defer i.lock.Unlock()
 
 	for k, item := range i.data {
 		if item.IsExpired() {
@@ -101,13 +101,16 @@ func (i *InMemoryStore) GC() {
 			delete(i.data, k)
 		}
 	}
+
+	i.lock.Unlock()
 }
 
 func (i *InMemoryStore) count() int {
 	i.lock.Lock()
-	defer i.lock.Unlock()
+	n := len(i.data)
+	i.lock.Unlock()
 
-	return len(i.data)
+	return n
 }
 
 func copyData(data []byte) []byte {
