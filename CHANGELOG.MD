@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.4.1 (2018-03-10)
+
+- Cleaned up methods arguments
+
 ## 2.4.0 (2018-03-10)
 
 - Do not run GC automatically. Let it be user initiated. See `README`.
