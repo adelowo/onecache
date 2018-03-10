@@ -67,19 +67,6 @@ return store.Get("number")
 
 ```
 
-A couple things to keep in mind while making use of `onecache.Get("adapter_alias")` :
-
-- For the filesystem and memory adapters, ___garbage collection___ isn't run automatically, you would have to manually do this by calling `GC()`.
-
-```go
-
-fs, _ := onecache.Get("fs")
-
-go fs.GC(time.Minute * 10) //Check for and delete expired items every 10 minutes
-
-//Or make use of the constructors provided by the adapters (auto GC) -- NewXXX()
-```
-
 - Redis : THe connection used is `localhost:6379` with the default database and an empty password.. While this would suffce for most usage, if you have custom connection requirements (like a password protected redis database, refer to the [examples][eg] too see how to make use of custom connection parameters.
 
 - Memcached - The Memcached server connected to is located at the address `127.0.0.1:11211` which is usually the default. If you have custom requirements, please refer to the [examples][eg] to see how to make use of custom connection parameters.

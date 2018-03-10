@@ -29,7 +29,6 @@ func NewInMemoryStore(gcInterval time.Duration) *InMemoryStore {
 		data: make(map[string]*onecache.Item),
 	}
 
-	go i.GC(gcInterval)
 	return i
 }
 

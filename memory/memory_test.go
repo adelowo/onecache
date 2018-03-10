@@ -197,6 +197,7 @@ func TestInMemoryStore_GC(t *testing.T) {
 		{"x", "yz", time.Microsecond},
 	}
 
+	go store.GC(time.Second * 3)
 	for _, v := range tableTests {
 		store.Set(v.key, []byte(v.value), v.expires)
 	}

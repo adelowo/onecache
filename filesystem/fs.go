@@ -57,11 +57,7 @@ func MustNewFSStore(baseDir string, gcInterval time.Duration) *FSStore {
 		}
 	}
 
-	fs := &FSStore{baseDir, onecache.NewCacheSerializer()}
-
-	go fs.GC(gcInterval)
-
-	return fs
+	return &FSStore{baseDir, onecache.NewCacheSerializer()}
 }
 
 func (fs *FSStore) Set(key string, data []byte, expiresAt time.Duration) error {

@@ -178,6 +178,8 @@ func TestFSStore_GC(t *testing.T) {
 		store.Set(v.key, []byte(v.value), v.expires)
 	}
 
+	go store.GC(time.Second)
+
 	time.Sleep(time.Second * 2)
 
 	var filePath string
