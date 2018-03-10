@@ -115,7 +115,7 @@ func (fs *FSStore) Flush() error {
 	return os.RemoveAll(fs.baseDir)
 }
 
-func (fs *FSStore) GC(gcInterval time.Duration) {
+func (fs *FSStore) GC() {
 
 	filepath.Walk(
 		fs.baseDir,
@@ -149,10 +149,6 @@ func (fs *FSStore) GC(gcInterval time.Duration) {
 
 			return nil
 		})
-
-	time.AfterFunc(gcInterval, func() {
-		fs.GC(gcInterval)
-	})
 }
 
 func (fs *FSStore) Has(key string) bool {

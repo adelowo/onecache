@@ -90,13 +90,9 @@ func (i *InMemoryStore) Has(key string) bool {
 	return ok
 }
 
-func (i *InMemoryStore) GC(gcInterval time.Duration) {
+func (i *InMemoryStore) GC() {
 	i.lock.Lock()
 	defer i.lock.Unlock()
-
-	if gcInterval <= (time.Second * 1) {
-		return
-	}
 
 	for k, item := range i.data {
 		if item.IsExpired() {
@@ -105,10 +101,6 @@ func (i *InMemoryStore) GC(gcInterval time.Duration) {
 			delete(i.data, k)
 		}
 	}
-
-	time.AfterFunc(gcInterval, func() {
-		i.GC(gcInterval)
-	})
 }
 
 func (i *InMemoryStore) count() int {

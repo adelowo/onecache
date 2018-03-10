@@ -71,6 +71,9 @@ return store.Get("number")
 
 - Memcached - The Memcached server connected to is located at the address `127.0.0.1:11211` which is usually the default. If you have custom requirements, please refer to the [examples][eg] to see how to make use of custom connection parameters.
 
+Some adapters like the `filesystem` and `memory` have a ___Garbage collection___ implementation. All
+that is needed to call is `store.GC()`. Ideally, this should be called in a `ticker.C`. 
+
 <div id="extra"></div>
 
 ```go

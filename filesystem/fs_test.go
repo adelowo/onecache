@@ -178,7 +178,7 @@ func TestFSStore_GC(t *testing.T) {
 		store.Set(v.key, []byte(v.value), v.expires)
 	}
 
-	go store.GC(time.Second)
+	go store.GC()
 
 	time.Sleep(time.Second * 2)
 

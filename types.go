@@ -39,5 +39,5 @@ type Store interface {
 //It's implementation should re run this function everytime the interval is reached
 //Say every 5 minutes.
 type GarbageCollector interface {
-	GC(interval time.Duration)
+	GC()
 }
