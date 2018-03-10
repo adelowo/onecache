@@ -25,9 +25,7 @@ func init() {
 		_, err := os.Stat(baseDir)
 
 		if err != nil {
-			if err := createDirectory(baseDir); err != nil {
-				panic(fmt.Errorf("Base directory could not be created : %s", err))
-			}
+			createDirectory(baseDir)
 		}
 
 		return &FSStore{baseDir, onecache.NewCacheSerializer()}
