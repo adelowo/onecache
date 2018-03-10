@@ -42,7 +42,7 @@ func inMemoryStore() {
 	//Something like time.Minute * 10
 	//In other to prevent doing the same thing over and over again
 	// if nothing really changed
-	mem := memory.NewInMemoryStore(time.Minute * 2)
+	mem := memory.NewInMemoryStore()
 	fmt.Println(mem.Set("name", []byte("Lanre"), time.Minute*10))
 	fmt.Println(mem.Get("name"))
 	fmt.Println(mem.Set("occupation", []byte("What ?"), time.Second))
@@ -82,7 +82,7 @@ func fileSystemCache(marshal *onecache.CacheSerializer) {
 
 	var store onecache.Store
 
-	store = filesystem.MustNewFSStore("/home/adez/onecache_tmp", time.Minute*10)
+	store = filesystem.MustNewFSStore("/home/adez/onecache_tmp")
 
 	err := store.Set("profile", []byte("Lanre"), time.Second*60)
 

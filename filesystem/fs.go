@@ -35,7 +35,6 @@ func init() {
 }
 
 func createDirectory(dir string) error {
-
 	return os.MkdirAll(dir, defaultDirectoryFilePerm)
 }
 
@@ -47,7 +46,7 @@ type FSStore struct {
 //Returns an initialized Filesystem Cache
 //If a non-existent directory is passed, it would be created automatically.
 //This function Panics if the directory could not be created
-func MustNewFSStore(baseDir string, gcInterval time.Duration) *FSStore {
+func MustNewFSStore(baseDir string) *FSStore {
 
 	_, err := os.Stat(baseDir)
 

@@ -24,7 +24,7 @@ type InMemoryStore struct {
 }
 
 //Returns a new instance of the Inmemory store
-func NewInMemoryStore(gcInterval time.Duration) *InMemoryStore {
+func NewInMemoryStore() *InMemoryStore {
 	return &InMemoryStore{
 		data: make(map[string]*onecache.Item),
 	}
