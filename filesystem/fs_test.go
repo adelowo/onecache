@@ -14,15 +14,15 @@ import (
 	"github.com/adelowo/onecache"
 )
 
-var _ onecache.Store = MustNewFSStore("./", time.Second)
+var _ onecache.Store = MustNewFSStore("./")
 
-var _ onecache.GarbageCollector = MustNewFSStore("./", time.Second)
+var _ onecache.GarbageCollector = MustNewFSStore("./")
 
 var fileCache *FSStore
 
 func TestMain(m *testing.M) {
 
-	fileCache = MustNewFSStore("./../cache", time.Second*1)
+	fileCache = MustNewFSStore("./../cache")
 
 	flag.Parse()
 	os.Exit(m.Run())
@@ -34,7 +34,7 @@ func TestMustNewFSStore(t *testing.T) {
 		recover()
 	}()
 
-	_ = MustNewFSStore("/hh", time.Second)
+	_ = MustNewFSStore("/hh")
 }
 
 var sampleData = []byte("Lanre")
@@ -163,7 +163,7 @@ func TestFSStore_Delete(t *testing.T) {
 func TestFSStore_GC(t *testing.T) {
 	//Set garbage collection interval to every 5 second
 
-	store := MustNewFSStore("./../cache", time.Second*1)
+	store := MustNewFSStore("./../cache")
 
 	tableTests := []struct {
 		key, value string
@@ -197,7 +197,7 @@ func TestFSStore_GC(t *testing.T) {
 }
 
 func TestFSStore_Has(t *testing.T) {
-	store := MustNewFSStore("./../cache", time.Second*70)
+	store := MustNewFSStore("./../cache")
 
 	if ok := store.Has("name"); ok {
 		t.Fatalf("Key %s is not supposed to exist in the cache", "name")

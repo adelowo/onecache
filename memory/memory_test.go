@@ -19,7 +19,7 @@ var memoryStore *InMemoryStore
 
 func TestMain(t *testing.M) {
 
-	memoryStore = NewInMemoryStore(time.Second * 1)
+	memoryStore = NewInMemoryStore()
 
 	flag.Parse()
 
@@ -186,7 +186,7 @@ func TestInMemoryStore_Flush(t *testing.T) {
 func TestInMemoryStore_GC(t *testing.T) {
 
 	//Set garbage collection interval to every 5 second
-	store := NewInMemoryStore(time.Second * 3)
+	store := NewInMemoryStore()
 
 	tableTests := []struct {
 		key, value string
@@ -224,7 +224,7 @@ func TestInMemoryStore_GC(t *testing.T) {
 
 func TestInMemoryStore_Has(t *testing.T) {
 
-	store := NewInMemoryStore(time.Second * 10)
+	store := NewInMemoryStore()
 
 	if ok := store.Has("name"); ok {
 		t.Fatalf("Key %s does not exist", "name")
