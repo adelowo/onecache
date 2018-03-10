@@ -237,12 +237,4 @@ func TestInMemoryStore_Has(t *testing.T) {
 	}
 }
 
-func TestExtends(t *testing.T) {
 
-	_, err := onecache.Get("memory")
-
-	if err != nil {
-		t.Fatalf("Expected a nil error value.. Got %v", err)
-	}
-
-}

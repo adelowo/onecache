@@ -211,11 +211,4 @@ func TestFSStore_Has(t *testing.T) {
 	}
 }
 
-func TestExtensibility(t *testing.T) {
 
-	_, err := onecache.Get("fs")
-
-	if err != nil {
-		t.Fatalf("An error occurred.. %v", err)
-	}
-}

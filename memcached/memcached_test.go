@@ -126,11 +126,4 @@ func TestMemcachedStore_Has(t *testing.T) {
 
 }
 
-func TestExtensibility(t *testing.T) {
 
-	_, err := onecache.Get("memcached")
-
-	if err != nil {
-		t.Fatalf("An error occured.. %v", err)
-	}
-}

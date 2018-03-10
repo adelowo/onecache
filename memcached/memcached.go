@@ -8,17 +8,6 @@ import (
 	"github.com/bradfitz/gomemcache/memcache"
 )
 
-func init() {
-
-	//Make use of NewMemcachedStore() for customization of the server list
-	//and others
-	onecache.Extend("memcached", func() onecache.Store {
-		return NewMemcachedStore(memcache.New("127.0.0.1:11211"),
-			"onecache:",
-		)
-	})
-}
-
 type MemcachedStore struct {
 	client *memcache.Client
 	prefix string

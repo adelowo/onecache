@@ -16,18 +16,6 @@ type RedisStore struct {
 	prefix string
 }
 
-func init() {
-	onecache.Extend("redis", func() onecache.Store {
-		//Default for most usage..
-		//Can make use of NewRedisStore() for custom settings
-		return NewRedisStore(&redis.Options{
-			Addr:     "localhost:6379",
-			Password: "",
-			DB:       0,
-		}, defaultPrefix)
-	})
-}
-
 //Returns a new instance of the RedisStore
 //If prefix is an empty string, the default cache prefix is used
 func NewRedisStore(opts *redis.Options, prefix string) *RedisStore {

@@ -9,14 +9,6 @@ import (
 	"github.com/adelowo/onecache"
 )
 
-func init() {
-	onecache.Extend("memory", func() onecache.Store {
-		return &InMemoryStore{
-			data: make(map[string]*onecache.Item),
-		}
-	})
-}
-
 //Represents an inmemory store
 type InMemoryStore struct {
 	lock sync.RWMutex

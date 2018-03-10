@@ -158,11 +158,4 @@ func TestRedisStore_Has(t *testing.T) {
 	}
 }
 
-func TestExtensibility(t *testing.T) {
 
-	_, err := onecache.Get("redis")
-
-	if err != nil {
-		t.Fatalf("An error occurred %v", err)
-	}
-}
