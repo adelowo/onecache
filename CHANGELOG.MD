@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.4.0 (2018-03-10)
+
+- Do not run GC automatically. Let it be user initiated. See `README`.
+
 ## 2.3.2 (2017-07-25)
 
 - Garbage collection should always run inside another goroutine.. THis is to prevent blocking.
