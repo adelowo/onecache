@@ -24,7 +24,8 @@ func New(opts ...Option) *InMemoryStore {
 	if i.data == nil {
 		var n int
 		if i.bufferSize <= 0 {
-			n = 1000
+			n = 100
+			i.bufferSize = 100
 		} else {
 			n = i.bufferSize
 		}
@@ -45,7 +46,8 @@ type InMemoryStore struct {
 	keyfn onecache.KeyFunc
 }
 
-//Returns a new instance of the Inmemory store
+// NewInMemoryStore returns a new instance of the Inmemory store
+// Deprecated... Use New() instead
 func NewInMemoryStore() *InMemoryStore {
 	return New()
 }
@@ -98,7 +100,7 @@ func (i *InMemoryStore) Delete(key string) error {
 func (i *InMemoryStore) Flush() error {
 	i.lock.Lock()
 
-	i.data = make(map[string]*onecache.Item)
+	i.data = make(map[string]*onecache.Item, i.bufferSize)
 	i.lock.Unlock()
 	return nil
 }
