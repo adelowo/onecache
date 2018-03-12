@@ -22,15 +22,11 @@ func New(opts ...Option) *InMemoryStore {
 	}
 
 	if i.data == nil {
-		var n int
-		if i.bufferSize <= 0 {
-			n = 100
+		if i.bufferSize == 0 {
 			i.bufferSize = 100
-		} else {
-			n = i.bufferSize
 		}
 
-		i.data = make(map[string]*onecache.Item,n)
+		i.data = make(map[string]*onecache.Item,i.bufferSize)
 	}
 
 	return i
