@@ -4,7 +4,6 @@ package redis
 import (
 	"time"
 
-	"github.com/adelowo/onecache"
 	"github.com/go-redis/redis"
 )
 
