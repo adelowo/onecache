@@ -25,8 +25,6 @@ func CacheKeyGenerator(fn onecache.KeyFunc) Option {
 	}
 }
 
-//Default prefix to prevent collision with other key stored in redis
-const defaultPrefix = "onecache:"
 
 type RedisStore struct {
 	client *redis.Client
