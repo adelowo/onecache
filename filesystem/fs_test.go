@@ -42,7 +42,6 @@ var sampleData = []byte("Lanre")
 func TestFSStore_Set(t *testing.T) {
 
 	err := fileCache.Set("name", sampleData, time.Minute*2)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -129,41 +128,43 @@ func TestFSStore_GetFailsBecauseOfBytesMarshalling(t *testing.T) {
 
 	fileCache.Set("test", []byte("test"), time.Second*1)
 
-	fs := &FSStore{"./../cache", &mockSerializer{}}
+	fs, err := New(BaseDirectory("./cache"), Serializer(&mockSerializer{}))
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	_, err := fs.Get("test")
-
+	_, err = fs.Get("test")
 	if err == nil {
 		t.Fatalf(
 			`Expected a cache miss.. Got %v`, err)
 	}
-
 }
 
 func TestFSStore_SetFailsBecauseOfBytesMarshalling(t *testing.T) {
 
-	fs := &FSStore{"./../cache", &mockSerializer{}}
+	fs, err := New(BaseDirectory("./cache"), Serializer(&mockSerializer{}))
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	err := fs.Set("test", []byte("test"), time.Nanosecond*4)
+	defer fs.Flush()
 
+	err = fs.Set("test", []byte("test"), time.Nanosecond*4)
 	if err == nil {
 		t.Fatalf(
 			`Expected an error from bytes marshalling.. Got %v`, err)
 	}
-
 }
 
 func TestFSStore_Delete(t *testing.T) {
-
 	if err := fileCache.Delete("name"); err != nil {
 		t.Fatalf("Could not delete the cached data... %v", err)
 	}
 }
 
 func TestFSStore_GC(t *testing.T) {
-	//Set garbage collection interval to every 5 second
-
 	store := MustNewFSStore("./../cache")
+	defer store.Flush()
 
 	tableTests := []struct {
 		key, value string
@@ -178,9 +179,10 @@ func TestFSStore_GC(t *testing.T) {
 		store.Set(v.key, []byte(v.value), v.expires)
 	}
 
-	go store.GC()
+	ticker := time.NewTicker(time.Millisecond)
+	<-ticker.C
 
-	time.Sleep(time.Second * 2)
+	store.GC()
 
 	var filePath string
 
@@ -199,6 +201,8 @@ func TestFSStore_GC(t *testing.T) {
 func TestFSStore_Has(t *testing.T) {
 	store := MustNewFSStore("./../cache")
 
+	defer store.Flush()
+
 	if ok := store.Has("name"); ok {
 		t.Fatalf("Key %s is not supposed to exist in the cache", "name")
 	}
@@ -210,5 +214,3 @@ func TestFSStore_Has(t *testing.T) {
 			since that key was persisted secs ago`, "name")
 	}
 }
-
-
