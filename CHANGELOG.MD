@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.5.0 (2018-03-13)
+
+- Removed `Extend` and `Get`
+- Added options to allow configuring stores
+
 ## 2.4.1 (2018-03-10)
 
 - Cleaned up methods arguments
