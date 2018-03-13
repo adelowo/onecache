@@ -108,7 +108,7 @@ func TestFilePathForKey(t *testing.T) {
 
 	path := filepath.Join(fileCache.baseDir, s[0:2], s[2:4], s[4:6], s)
 
-	if x := fileCache.filePathFor("page_hits"); path != x {
+	if x := fileCache.filePathFor("page_hits"); path != x && FilePathKeyFunc(key) != path {
 		t.Fatalf("Path differs.. Expected %s. Got %s instead", path, x)
 	}
 }
