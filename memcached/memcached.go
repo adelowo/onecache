@@ -10,12 +10,11 @@ import (
 
 type MemcachedStore struct {
 	client *memcache.Client
-	keyfn onecache.KeyFunc
+	keyfn  onecache.KeyFunc
 }
 
 // Option defines a Memcached option
 type Option func(m *MemcachedStore)
-
 
 // Client configures the store to make use of the passed client
 func Client(client *memcache.Client) Option {

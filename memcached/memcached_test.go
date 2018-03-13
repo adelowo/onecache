@@ -96,9 +96,7 @@ func TestMemcachedStore_adaptError(t *testing.T) {
 }
 
 func TestMemcachedStore_Has(t *testing.T) {
-	memcachedStore = NewMemcachedStore(memcache.New("127.0.0.1:11211"),
-		"",
-	)
+	memcachedStore = New()
 
 	if ok := memcachedStore.Has("name"); ok {
 		t.Fatalf("Key %s is not supposed to exist in the cache", "name")
@@ -112,5 +110,3 @@ func TestMemcachedStore_Has(t *testing.T) {
 	}
 
 }
-
-
