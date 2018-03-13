@@ -31,7 +31,7 @@ func New(opts ...Option) *MemcachedStore {
 	}
 
 	if mc.client == nil {
-		Client(memcache.New("11211"))(mc)
+		Client(memcache.New("127.0.0.1:11211"))(mc)
 	}
 
 	if mc.keyfn == nil {
