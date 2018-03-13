@@ -95,19 +95,6 @@ func TestMemcachedStore_adaptError(t *testing.T) {
 
 }
 
-func TestMemcachedStore_DefaultPrefixIsUsedWhenNoneIsSpecified(t *testing.T) {
-	memcachedStore = NewMemcachedStore(memcache.New("127.0.0.1:11211"),
-		"",
-	)
-
-	if !reflect.DeepEqual(memcachedStore.prefix, PREFIX) {
-		t.Fatalf(
-			`Prefix doen't match.
-			\n Expected %s \n.. Got %s`,
-			PREFIX, memcachedStore.prefix)
-	}
-}
-
 func TestMemcachedStore_Has(t *testing.T) {
 	memcachedStore = NewMemcachedStore(memcache.New("127.0.0.1:11211"),
 		"",
