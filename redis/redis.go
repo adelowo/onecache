@@ -4,8 +4,8 @@ package redis
 import (
 	"time"
 
-	"github.com/go-redis/redis"
 	"github.com/adelowo/onecache"
+	"github.com/go-redis/redis"
 )
 
 // Option is a redis option type
@@ -24,7 +24,6 @@ func CacheKeyGenerator(fn onecache.KeyFunc) Option {
 		r.keyFn = fn
 	}
 }
-
 
 type RedisStore struct {
 	client *redis.Client
@@ -54,7 +53,6 @@ func New(opts ...Option) *RedisStore {
 	if r.keyFn == nil {
 		r.keyFn = onecache.DefaultKeyFunc
 	}
-
 
 	return r
 }

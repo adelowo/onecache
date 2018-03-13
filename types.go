@@ -16,12 +16,11 @@ var (
 	ErrCacheNotSupported                     = errors.New("Operation not supported")
 	ErrCacheDataCannotBeIncreasedOrDecreased = errors.New(`
 		Data isn't an integer/string type. Hence, it cannot be increased or decreased`)
-
 )
 
 // DefaultKeyFunc is the default implementation of cache keys
 // All it does is to preprend "onecache:" to the key sent in by client code
-func DefaultKeyFunc (s string) string {
+func DefaultKeyFunc(s string) string {
 	return "onecache:" + s
 }
 

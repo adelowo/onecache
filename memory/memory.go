@@ -26,12 +26,11 @@ func New(opts ...Option) *InMemoryStore {
 			i.bufferSize = 100
 		}
 
-		i.data = make(map[string]*onecache.Item,i.bufferSize)
+		i.data = make(map[string]*onecache.Item, i.bufferSize)
 	}
 
 	return i
 }
-
 
 //Represents an in-memory store
 type InMemoryStore struct {
@@ -39,7 +38,7 @@ type InMemoryStore struct {
 	data map[string]*onecache.Item
 
 	bufferSize int
-	keyfn onecache.KeyFunc
+	keyfn      onecache.KeyFunc
 }
 
 // NewInMemoryStore returns a new instance of the Inmemory store

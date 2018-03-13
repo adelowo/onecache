@@ -197,7 +197,7 @@ func TestInMemoryStore_GC(t *testing.T) {
 	}
 
 	for _, v := range tableTests {
-		if err := store.Set(v.key, []byte(v.value), v.expires); err !=  nil {
+		if err := store.Set(v.key, []byte(v.value), v.expires); err != nil {
 			t.Fatalf("an error occurred while trying to write to store.. %v", err)
 		}
 	}

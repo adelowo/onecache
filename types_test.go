@@ -1,16 +1,16 @@
 package onecache
 
 import (
-	"testing"
 	"strings"
+	"testing"
 )
 
 func TestDefaultKeyFunc(t *testing.T) {
 
-	tt := []struct{
+	tt := []struct {
 		expected, original string
-	} {
-		{"onecache:lanre","lanre",},
+	}{
+		{"onecache:lanre", "lanre"},
 		{"onecache:onecache", "onecache"},
 	}
 
