@@ -124,28 +124,8 @@ func TestRedisStore_GetUnknownKey(t *testing.T) {
 	}
 }
 
-func TestNewRedisStore_DefaultPrefixIsUsedIfNoneIsProvided(t *testing.T) {
-
-	s := NewRedisStore(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "", // no password set
-		DB:       0,  // use default DB
-	}, "")
-
-	if !reflect.DeepEqual(defaultPrefix, s.prefix) {
-		t.Fatalf(`
-		Redis store prefix is invalid..
-		Expected %s \n... Got %s`, defaultPrefix, s.prefix)
-	}
-
-}
-
 func TestRedisStore_Has(t *testing.T) {
-	s := NewRedisStore(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "", // no password set
-		DB:       0,  // use default DB
-	}, "")
+	s := New()
 
 	if ok := s.Has("name"); ok {
 		t.Fatalf("Key %s is not supposed to exist in the cache", "name")
@@ -155,14 +135,5 @@ func TestRedisStore_Has(t *testing.T) {
 
 	if ok := s.Has("name"); !ok {
 		t.Fatalf("Key %s is supposed to exist in the cache", "name")
-	}
-}
-
-func TestExtensibility(t *testing.T) {
-
-	_, err := onecache.Get("redis")
-
-	if err != nil {
-		t.Fatalf("An error occurred %v", err)
 	}
 }

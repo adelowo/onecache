@@ -8,42 +8,48 @@ import (
 	"github.com/bradfitz/gomemcache/memcache"
 )
 
-func init() {
-
-	//Make use of NewMemcachedStore() for customization of the server list
-	//and others
-	onecache.Extend("memcached", func() onecache.Store {
-		return NewMemcachedStore(memcache.New("127.0.0.1:11211"),
-			"onecache:",
-		)
-	})
-}
-
 type MemcachedStore struct {
 	client *memcache.Client
-	prefix string
+	keyfn  onecache.KeyFunc
 }
 
-//PREFIX prevents collision with other items stored in the db
-const PREFIX = "onecache:"
+// Option defines a Memcached option
+type Option func(m *MemcachedStore)
 
+// Client configures the store to make use of the passed client
+func Client(client *memcache.Client) Option {
+	return func(m *MemcachedStore) {
+		m.client = client
+	}
+}
+
+func New(opts ...Option) *MemcachedStore {
+	mc := &MemcachedStore{}
+
+	for _, opt := range opts {
+		opt(mc)
+	}
+
+	if mc.client == nil {
+		Client(memcache.New("127.0.0.1:11211"))(mc)
+	}
+
+	if mc.keyfn == nil {
+		mc.keyfn = onecache.DefaultKeyFunc
+	}
+
+	return mc
+}
+
+// Deprecated -- Use New instead
 //Returns a new instance of the memached store.
 //If prefix is an empty string, it defaults to the package's prefix constant
 func NewMemcachedStore(c *memcache.Client, prefix string) *MemcachedStore {
-
-	var p string
-
-	if prefix == "" {
-		p = PREFIX
-	} else {
-		p = prefix
-	}
-
-	return &MemcachedStore{client: c, prefix: p}
+	return New(Client(c))
 }
 
 func (m *MemcachedStore) key(k string) string {
-	return m.prefix + k
+	return m.keyfn(k)
 }
 
 func (m *MemcachedStore) Set(k string, data []byte, expires time.Duration) error {

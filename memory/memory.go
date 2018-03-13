@@ -9,31 +9,49 @@ import (
 	"github.com/adelowo/onecache"
 )
 
-func init() {
-	onecache.Extend("memory", func() onecache.Store {
-		return &InMemoryStore{
-			data: make(map[string]*onecache.Item),
+// New returns a configured in memory store
+func New(opts ...Option) *InMemoryStore {
+	i := &InMemoryStore{}
+
+	for _, opt := range opts {
+		opt(i)
+	}
+
+	if i.keyfn == nil {
+		i.keyfn = onecache.DefaultKeyFunc
+	}
+
+	if i.data == nil {
+		if i.bufferSize == 0 {
+			i.bufferSize = 100
 		}
-	})
+
+		i.data = make(map[string]*onecache.Item,i.bufferSize)
+	}
+
+	return i
 }
 
-//Represents an inmemory store
+
+//Represents an in-memory store
 type InMemoryStore struct {
 	lock sync.RWMutex
 	data map[string]*onecache.Item
+
+	bufferSize int
+	keyfn onecache.KeyFunc
 }
 
-//Returns a new instance of the Inmemory store
+// NewInMemoryStore returns a new instance of the Inmemory store
+// Deprecated... Use New() instead
 func NewInMemoryStore() *InMemoryStore {
-	return &InMemoryStore{
-		data: make(map[string]*onecache.Item),
-	}
+	return New()
 }
 
 func (i *InMemoryStore) Set(key string, data []byte, expires time.Duration) error {
 	i.lock.Lock()
 
-	i.data[key] = &onecache.Item{
+	i.data[i.keyfn(key)] = &onecache.Item{
 		ExpiresAt: time.Now().Add(expires),
 		Data:      copyData(data),
 	}
@@ -45,7 +63,7 @@ func (i *InMemoryStore) Set(key string, data []byte, expires time.Duration) erro
 func (i *InMemoryStore) Get(key string) ([]byte, error) {
 	i.lock.RLock()
 
-	item := i.data[key]
+	item := i.data[i.keyfn(key)]
 	if item == nil {
 		i.lock.RUnlock()
 		return nil, onecache.ErrCacheMiss
@@ -64,21 +82,21 @@ func (i *InMemoryStore) Get(key string) ([]byte, error) {
 func (i *InMemoryStore) Delete(key string) error {
 	i.lock.Lock()
 
-	_, ok := i.data[key]
+	_, ok := i.data[i.keyfn(key)]
 	if !ok {
 		i.lock.Unlock()
 		return onecache.ErrCacheMiss
 	}
 
 	i.lock.Unlock()
-	delete(i.data, key)
+	delete(i.data, i.keyfn(key))
 	return nil
 }
 
 func (i *InMemoryStore) Flush() error {
 	i.lock.Lock()
 
-	i.data = make(map[string]*onecache.Item)
+	i.data = make(map[string]*onecache.Item, i.bufferSize)
 	i.lock.Unlock()
 	return nil
 }
@@ -86,7 +104,7 @@ func (i *InMemoryStore) Flush() error {
 func (i *InMemoryStore) Has(key string) bool {
 	i.lock.RLock()
 
-	_, ok := i.data[key]
+	_, ok := i.data[i.keyfn(key)]
 	i.lock.RUnlock()
 	return ok
 }

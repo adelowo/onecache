@@ -185,7 +185,6 @@ func TestInMemoryStore_Flush(t *testing.T) {
 
 func TestInMemoryStore_GC(t *testing.T) {
 
-	//Set garbage collection interval to every 5 second
 	store := NewInMemoryStore()
 
 	tableTests := []struct {
@@ -197,20 +196,16 @@ func TestInMemoryStore_GC(t *testing.T) {
 		{"x", "yz", time.Microsecond},
 	}
 
-	go store.GC()
 	for _, v := range tableTests {
-		store.Set(v.key, []byte(v.value), v.expires)
+		if err := store.Set(v.key, []byte(v.value), v.expires); err !=  nil {
+			t.Fatalf("an error occurred while trying to write to store.. %v", err)
+		}
 	}
 
-	//Flaky tests but I really can't bring myself to get
-	//a new dep because of this.
-	//
-	//We don't call GET here since GET would internally invalidate
-	//expired items
-	//Instead we move 2 sec forward to inspect
-	//the result of Garbage collection
-	time.Sleep(time.Second * 6)
+	ticker := time.NewTicker(time.Millisecond)
 
+	<-ticker.C
+	store.GC()
 	//GC should wipe everything off since they are well past
 	//their expiration time
 	expectedNumberOfItemsInStore := 0
@@ -220,6 +215,8 @@ func TestInMemoryStore_GC(t *testing.T) {
 			`Expected %d items in the store. %d found`,
 			expectedNumberOfItemsInStore, x)
 	}
+
+	ticker.Stop()
 }
 
 func TestInMemoryStore_Has(t *testing.T) {
@@ -235,14 +232,4 @@ func TestInMemoryStore_Has(t *testing.T) {
 	if ok := store.Has("name"); !ok {
 		t.Fatalf("Key %s was set and is supposed to exist", "name")
 	}
-}
-
-func TestExtends(t *testing.T) {
-
-	_, err := onecache.Get("memory")
-
-	if err != nil {
-		t.Fatalf("Expected a nil error value.. Got %v", err)
-	}
-
 }
