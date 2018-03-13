@@ -5,29 +5,67 @@ import (
 	"time"
 
 	"github.com/go-redis/redis"
+	"github.com/adelowo/onecache"
 )
+
+// Option is a redis option type
+type Option func(r *RedisStore)
+
+// ClientOptions is an Option type that allows configuring a redis client
+func ClientOptions(opts *redis.Options) Option {
+	return func(r *RedisStore) {
+		r.client = redis.NewClient(opts)
+	}
+}
+
+// CacheKeyGenerator allows configuring the cache key generation process
+func CacheKeyGenerator(fn onecache.KeyFunc) Option {
+	return func(r *RedisStore) {
+		r.keyFn = fn
+	}
+}
 
 //Default prefix to prevent collision with other key stored in redis
 const defaultPrefix = "onecache:"
 
 type RedisStore struct {
 	client *redis.Client
-	prefix string
+
+	keyFn onecache.KeyFunc
 }
 
-//Returns a new instance of the RedisStore
-//If prefix is an empty string, the default cache prefix is used
-func NewRedisStore(opts *redis.Options, prefix string) *RedisStore {
+// New returns a new RedisStore by applying all options passed into it
+// It also sets sensible defaults too
+func New(opts ...Option) *RedisStore {
+	r := &RedisStore{}
 
-	var p string
-
-	if prefix == "" {
-		p = defaultPrefix
-	} else {
-		p = prefix
+	for _, opt := range opts {
+		opt(r)
 	}
 
-	return &RedisStore{redis.NewClient(opts), p}
+	if r.client == nil {
+		redisOpts := &redis.Options{
+			Addr:     "localhost:6379",
+			Password: "",
+			DB:       0,
+		}
+
+		ClientOptions(redisOpts)(r)
+	}
+
+	if r.keyFn == nil {
+		r.keyFn = onecache.DefaultKeyFunc
+	}
+
+
+	return r
+}
+
+// Deprecated -- Use New instead
+// Returns a new instance of the RedisStore
+// If prefix is an empty string, the default cache prefix is used
+func NewRedisStore(opts *redis.Options, prefix string) *RedisStore {
+	return New(ClientOptions(opts))
 }
 
 func (r *RedisStore) Set(k string, data []byte, expires time.Duration) error {
@@ -35,14 +73,7 @@ func (r *RedisStore) Set(k string, data []byte, expires time.Duration) error {
 }
 
 func (r *RedisStore) Get(key string) ([]byte, error) {
-
-	val, err := r.client.Get(r.key(key)).Bytes()
-
-	if err != nil {
-		return nil, err
-	}
-
-	return val, nil
+	return r.client.Get(r.key(key)).Bytes()
 }
 
 func (r *RedisStore) Delete(key string) error {
@@ -63,5 +94,5 @@ func (r *RedisStore) Has(key string) bool {
 }
 
 func (r *RedisStore) key(k string) string {
-	return r.prefix + k
+	return r.keyFn(k)
 }

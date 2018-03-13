@@ -124,21 +124,6 @@ func TestRedisStore_GetUnknownKey(t *testing.T) {
 	}
 }
 
-func TestNewRedisStore_DefaultPrefixIsUsedIfNoneIsProvided(t *testing.T) {
-
-	s := NewRedisStore(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "", // no password set
-		DB:       0,  // use default DB
-	}, "")
-
-	if !reflect.DeepEqual(defaultPrefix, s.prefix) {
-		t.Fatalf(`
-		Redis store prefix is invalid..
-		Expected %s \n... Got %s`, defaultPrefix, s.prefix)
-	}
-
-}
 
 func TestRedisStore_Has(t *testing.T) {
 	s := NewRedisStore(&redis.Options{
