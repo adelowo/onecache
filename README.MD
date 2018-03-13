@@ -28,8 +28,6 @@ Supported cache stores
 
 OneCache also comes with ___garbage collection___. This is used by the filesystem and memory adapter to purge out expired items automatically. Please refer to the [examples][eg]
 
-> You can make use of `onecache.Get("memcached")` to access the memcached adapter.. Refer to the list above for other adapters' aliases. 
-
 
 <div id="eg"></div>
 
@@ -49,26 +47,6 @@ fmt.Println(err)
 fmt.Println(store.Get("profile"))
 
 ```
-
-You can also make use of the `Get` to fetch a store..
-
-```go
-
-store, err := onecache.Get("fs") //filesystem store
-
-if err != nil {
-	return err
-}
-
-_ := store.Set("number", []byte("42"), time.Hour * 10)
-
-return store.Get("number")
-
-```
-
-- Redis : THe connection used is `localhost:6379` with the default database and an empty password.. While this would suffce for most usage, if you have custom connection requirements (like a password protected redis database, refer to the [examples][eg] too see how to make use of custom connection parameters.
-
-- Memcached - The Memcached server connected to is located at the address `127.0.0.1:11211` which is usually the default. If you have custom requirements, please refer to the [examples][eg] to see how to make use of custom connection parameters.
 
 Some adapters like the `filesystem` and `memory` have a ___Garbage collection___ implementation. All
 that is needed to call is `store.GC()`. Ideally, this should be called in a `ticker.C`. 
