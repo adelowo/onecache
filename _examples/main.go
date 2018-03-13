@@ -82,7 +82,7 @@ func fileSystemCache(marshal *onecache.CacheSerializer) {
 
 	var store onecache.Store
 
-	store = filesystem.MustNewFSStore("/home/adez/onecache_tmp")
+	store = filesystem.MustNewFSStore("./onecache_tmp")
 
 	err := store.Set("profile", []byte("Lanre"), time.Second*60)
 

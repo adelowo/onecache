@@ -6,7 +6,6 @@
 - [Installation](#install)
 - [Supported stores](#stores)
 - [Examples](#eg)
-  - [3rd party stores](#extra)
 
 <div id="install"></div>
 
@@ -22,10 +21,10 @@ $ go get -u github.com/adelowo/onecache
 
 Supported cache stores
 
-- [x] InMemory - "memory"
-- [x] Filesystem - "fs"
-- [x] Memcached - "memcached"
-- [x] Redis  - "redis"
+- [x] InMemory 
+- [x] Filesystem
+- [x] Memcached
+- [x] Redis
 
 OneCache also comes with ___garbage collection___. This is used by the filesystem and memory adapter to purge out expired items automatically. Please refer to the [examples][eg]
 
@@ -73,26 +72,6 @@ return store.Get("number")
 
 Some adapters like the `filesystem` and `memory` have a ___Garbage collection___ implementation. All
 that is needed to call is `store.GC()`. Ideally, this should be called in a `ticker.C`. 
-
-<div id="extra"></div>
-
-### 3rd party store
-
-```go
-import (
-          "github.com/adelowo/onecache"
-)
-
-//This is lazy loaded..The function only  gets executed when you request for the boltdb store
-onecache.Extend("boltdb", func() onecache.Store {
-	cfg, _ := config.New("path.json")
-	return &Bolt{cfg.DBPath}
-})
-
-//Somewhere else
-boltStore, err := onecache.Get("boltdb")
-
-```
 
 ### LICENSE
 MIT
