@@ -5,7 +5,7 @@ sudo: false
 services:
   - redis-server
   - memcached
-  
+
 before_install:
   - go get github.com/mattn/goveralls
 
@@ -14,12 +14,8 @@ before_script:
   - go vet ./...
 
 go:
-  - 1.7
-  - 1.7.x
-  - 1.8
-  - 1.8.x
-  - 1.9
   - "1.10"
+  - "1.11.x"
   - tip
 
 script:
