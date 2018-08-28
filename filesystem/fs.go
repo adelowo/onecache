@@ -185,12 +185,8 @@ func (fs *FSStore) GC() {
 }
 
 func (fs *FSStore) Has(key string) bool {
-
-	if _, err := os.Open(fs.filePathFor(key)); err != nil {
-		return false
-	}
-
-	return true
+	_, err := os.Stat(fs.filePathFor(key))
+	return !os.IsNotExist(err)
 }
 
 func (fs *FSStore) filePathFor(key string) string {
