@@ -2,9 +2,11 @@
 package filesystem
 
 import (
+	"bytes"
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -108,15 +110,23 @@ func (fs *FSStore) Set(key string, data []byte, expiresAt time.Duration) error {
 //This runs garbage collection on the key if necessary
 func (fs *FSStore) Get(key string) ([]byte, error) {
 
-	b, err := ioutil.ReadFile(fs.filePathFor(key))
+	var b = new(bytes.Buffer)
+
+	f, err := os.OpenFile(fs.filePathFor(key), os.O_RDONLY, 0644)
 	if err != nil {
 		return nil, err
 	}
 
+	if _, err := io.Copy(b, f); err != nil {
+		f.Close()
+		return nil, err
+	}
+
+	f.Close()
+
 	i := new(onecache.Item)
 
-	err = fs.b.DeSerialize(b, i)
-	if err != nil {
+	if err := fs.b.DeSerialize(b.Bytes(), i); err != nil {
 		return nil, err
 	}
 

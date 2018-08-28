@@ -1,6 +1,7 @@
 package filesystem
 
 import (
+	"bytes"
 	"crypto/md5"
 	"encoding/hex"
 	"errors"
@@ -212,5 +213,36 @@ func TestFSStore_Has(t *testing.T) {
 	if ok := store.Has("name"); !ok {
 		t.Fatalf(`Expected store to have an item with key %s
 			since that key was persisted secs ago`, "name")
+	}
+}
+
+func BenchmarkFSStore_Get(b *testing.B) {
+
+	store := MustNewFSStore("./../cache")
+
+	key := "life"
+	answer := []byte("42")
+
+	err := store.Set(key, answer, time.Minute*10)
+	if err != nil {
+		b.Fatalf("an error occurred while setting key in cache store... %v", err)
+	}
+
+	b.ResetTimer()
+
+	equals := func(a, b []byte) bool {
+		return bytes.Equal(a, b)
+	}
+
+	for i := 0; i <= b.N; i++ {
+		buf, err := store.Get(key)
+		if err != nil {
+			b.Fatalf("an error happened while reading from cache.... %v", err)
+		}
+
+		if !equals(answer, buf) {
+			b.Fatalf(`Data does not match... Expected %v \n
+			Got %v`, answer, buf)
+		}
 	}
 }
