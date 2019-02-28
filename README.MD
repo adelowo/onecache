@@ -34,18 +34,24 @@ OneCache also comes with ___garbage collection___. This is used by the filesyste
 [Examples containing all adapters can be found here][eg]
 
 ```go
-
-
 var store onecache.Store
 
-store = filesystem.MustNewFSStore("/home/adez/onecache_tmp", time.Minute*10)
+store = filesystem.MustNewFSStore("/home/adez/onecache_tmp")
 
 err := store.Set("profile", []byte("Lanre"), time.Second*60)
 
-fmt.Println(err)
+if err != nil {
+	fmt.Println(err)
+	return
+}
 
-fmt.Println(store.Get("profile"))
+value,err := store.Get("profile")
+if err != nil {
+	fmt.Println(err)
+	return
+}
 
+fmt.Println(string(value))
 ```
 
 Some adapters like the `filesystem` and `memory` have a ___Garbage collection___ implementation. All
