@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"syscall"
 	"time"
 
 	"errors"
@@ -23,7 +24,6 @@ const (
 	defaultDirectoryFilePerm             = 0755
 )
 
-// FilePathKeyFunc takes a cache key and transforms it into a valid file path
 func FilePathKeyFunc(s string) string {
 
 	hashSum := md5.Sum([]byte(s))
@@ -44,9 +44,6 @@ type FSStore struct {
 	keyFn   onecache.KeyFunc
 }
 
-//Returns an initialized Filesystem Cache
-//If a non-existent directory is passed, it would be created automatically.
-//This function Panics if the directory could not be created
 func MustNewFSStore(baseDir string) *FSStore {
 
 	_, err := os.Stat(baseDir)
@@ -106,14 +103,21 @@ func (fs *FSStore) Set(key string, data []byte, expiresAt time.Duration) error {
 	return writeFile(path, b)
 }
 
-//Fetches a cache key.
-//This runs garbage collection on the key if necessary
 func (fs *FSStore) Get(key string) ([]byte, error) {
 
 	var b = new(bytes.Buffer)
 
 	f, err := os.OpenFile(fs.filePathFor(key), os.O_RDONLY, 0644)
 	if err != nil {
+		pe, ok := err.(*os.PathError)
+		if !ok {
+			return nil, err
+		}
+
+		if pe.Err == syscall.ENOENT && pe.Op == "open" {
+			return nil, onecache.ErrCacheMiss
+		}
+
 		return nil, err
 	}
 
@@ -138,12 +142,10 @@ func (fs *FSStore) Get(key string) ([]byte, error) {
 	return i.Data, nil
 }
 
-// Removes a file (cached item) from the disk
 func (fs *FSStore) Delete(key string) error {
 	return os.RemoveAll(fs.filePathFor(key))
 }
 
-// Flush cleans up the entire cache
 func (fs *FSStore) Flush() error {
 	return os.RemoveAll(fs.baseDir)
 }

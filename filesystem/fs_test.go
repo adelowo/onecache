@@ -73,6 +73,10 @@ func TestFSStore_GetUnknownKey(t *testing.T) {
 	if val != nil {
 		t.Fatalf("Expected a nil item to be return ... Got %v instead", val)
 	}
+
+	if err != onecache.ErrCacheMiss {
+		t.Fatalf("unexpected error found...Expected %v , got %v", onecache.ErrCacheMiss, err)
+	}
 }
 
 func TestFSStore_GarbageCollection(t *testing.T) {
