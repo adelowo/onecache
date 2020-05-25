@@ -79,16 +79,19 @@ func (i *InMemoryStore) Get(key string) ([]byte, error) {
 }
 
 func (i *InMemoryStore) Delete(key string) error {
-	i.lock.Lock()
+	i.lock.RLock()
 
 	_, ok := i.data[i.keyfn(key)]
 	if !ok {
-		i.lock.Unlock()
+		i.lock.RUnlock()
 		return onecache.ErrCacheMiss
 	}
 
-	i.lock.Unlock()
+	i.lock.RUnlock()
+
+	i.lock.Lock()
 	delete(i.data, i.keyfn(key))
+	i.lock.Unlock()
 	return nil
 }
 
